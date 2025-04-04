@@ -26,6 +26,7 @@ pub fn main() !void {
 
     try tokenizer.tokenize(buf, &stream_buf);
 
-    const elem = stream_buf.items[0];
-    std.debug.print("{}\n", .{elem});
+    for (stream_buf.items) |elem| {
+        std.debug.print("{}\n", .{elem});
+    }
 }

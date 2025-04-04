@@ -24,7 +24,8 @@ pub const TokenTag = union(enum) {
     minus,
     star,
     slash,
-    newline,
+    semicolon,
+    eof,
 
     pub fn format(self: *const TokenTag, _: []const u8, _: std.fmt.FormatOptions, writer: anytype) !void {
         switch (self.*) {
@@ -34,9 +35,10 @@ pub const TokenTag = union(enum) {
 
             .plus => try writer.print("Plus", .{}),
             .minus => try writer.print("Minus", .{}),
-            .newline => try writer.print("Newline", .{}),
             .star => try writer.print("Star", .{}),
+            .semicolon => try writer.print("Semicolon", .{}),
             .slash => try writer.print("Slash", .{}),
+            .eof => try writer.print("EOF", .{}),
         }
     }
 };
@@ -44,26 +46,65 @@ pub const TokenTag = union(enum) {
 pub fn tokenize(stream: []const u8, buf: *ArrayList(Token)) !void {
     var peek = PeekableIterator{ .buf = stream };
 
+    var line: u32 = 1;
+    var col: u32 = 1;
+    var len: u32 = 1;
+
     while (peek.next()) |tok| {
-        _ = switch (tok) {
-            '+' => TokenTag.plus,
-            '-' => TokenTag.minus,
-            '/' => TokenTag.slash,
-            '*' => TokenTag.star,
+        len = 1;
+        col += 1;
+        const next = switch (tok) {
+            '+' => .plus,
+            '-' => .minus,
+            '/' => .slash,
+            '*' => .star,
+            ';' => .semicolon,
 
-            '\n' => TokenTag.newline,
+            '\n' => {
+                col = 1;
+                line += 1;
+                continue;
+            },
 
-            '\t', ' ' => continue,
-            else => continue,
+            '\t', ' ' => {
+                col += 1;
+                continue;
+            },
+            else => ident: {
+                if (std.ascii.isAlphanumeric(tok)) {
+                    const start = peek.index - 1;
+
+                    while (peek.peek()) |peek_tok| {
+                        if (!std.ascii.isAlphanumeric(peek_tok)) {
+                            break;
+                        }
+                        len += 1;
+                        _ = peek.next();
+                    }
+
+                    const end = peek.index;
+
+                    break :ident TokenTag{ .ident = stream[start..end] };
+                } else {
+                    continue;
+                }
+            },
         };
+
+        const token = Token{
+            .tag = next,
+            .col = col,
+            .line = line,
+            .len = len,
+        };
+
+        try buf.append(token);
     }
 
-    const token = Token{
-        .tag = TokenTag{ .ident = "Hello!" },
-        .col = 0,
-        .line = 0,
-        .len = 6,
-    };
-
-    try buf.append(token);
+    try buf.append(Token{
+        .tag = TokenTag.eof,
+        .col = col,
+        .line = line,
+        .len = len,
+    });
 }
