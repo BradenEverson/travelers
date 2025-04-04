@@ -12,11 +12,10 @@ pub const TokenTag = union(enum) {
     ident: []const u8,
 
     pub fn format(self: *const TokenTag, _: []const u8, _: std.fmt.FormatOptions, writer: anytype) !void {
-        switch (self) {
+        switch (self.*) {
             .ident => |ident| {
                 try writer.print("{s}", .{ident});
             },
-            else => unreachable,
         }
     }
 };
