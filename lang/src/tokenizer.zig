@@ -13,7 +13,7 @@ pub const Token = struct {
         _: std.fmt.FormatOptions,
         writer: anytype,
     ) !void {
-        try writer.print("{{ {}, at line: {}, column: {}, length: {} }}", .{ self.tag, self.line, self.col, self.len });
+        try writer.print("{{ {}, line: {}, column: {}, length: {} }}", .{ self.tag, self.line, self.col, self.len });
     }
 };
 
@@ -23,7 +23,7 @@ pub const TokenTag = union(enum) {
     pub fn format(self: *const TokenTag, _: []const u8, _: std.fmt.FormatOptions, writer: anytype) !void {
         switch (self.*) {
             .ident => |ident| {
-                try writer.print("{s}", .{ident});
+                try writer.print("Identifier: \"{s}\"", .{ident});
             },
         }
     }
