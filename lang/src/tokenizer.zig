@@ -1,4 +1,5 @@
-const ArrayList = @import("std").ArrayList;
+const std = @import("std");
+const ArrayList = std.ArrayList;
 
 pub const Token = struct {
     tag: TokenTag,
@@ -9,6 +10,10 @@ pub const Token = struct {
 
 pub const TokenTag = union(enum) {
     ident: []const u8,
+
+    pub fn print(self: *const TokenTag) void {
+        std.debug.print("{s}", .{self.ident});
+    }
 };
 
 pub fn tokenize(stream: []const u8, buf: *ArrayList(Token)) !void {
