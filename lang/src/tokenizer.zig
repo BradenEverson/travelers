@@ -6,6 +6,15 @@ pub const Token = struct {
     line: u32,
     col: u32,
     len: u32,
+
+    pub fn format(
+        self: *const Token,
+        _: []const u8,
+        _: std.fmt.FormatOptions,
+        writer: anytype,
+    ) !void {
+        try writer.print("{{ {}, at line: {}, column: {}, length: {} }}", .{ self.tag, self.line, self.col, self.len });
+    }
 };
 
 pub const TokenTag = union(enum) {

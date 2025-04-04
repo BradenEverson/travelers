@@ -12,5 +12,5 @@ pub fn main() !void {
     try tokenizer.tokenize("", &stream_buf);
 
     const elem = stream_buf.items[0];
-    std.debug.print("{}\n", .{elem.tag});
+    std.debug.print("{}\n", .{elem});
 }
