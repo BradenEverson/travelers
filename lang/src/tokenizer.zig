@@ -11,8 +11,8 @@ pub const Token = struct {
 pub const TokenTag = union(enum) {
     ident: []const u8,
 
-    pub fn print(self: *const TokenTag) void {
-        std.debug.print("{s}", .{self.ident});
+    pub fn format(self: *const TokenTag, _: []const u8, _: std.fmt.FormatOptions, writer: anytype) !void {
+        try writer.print("{s}", .{self.ident});
     }
 };
 
