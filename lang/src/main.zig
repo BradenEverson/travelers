@@ -16,10 +16,15 @@ pub fn main() !void {
 
     std.debug.print("{s}\n", .{path});
 
+    const file = try std.fs.cwd().openFile(path, .{});
+    defer file.close();
+
+    const buf = try file.readToEndAlloc(allocator, std.math.maxInt(u32));
+
     var stream_buf = ArrayList(tokenizer.Token).init(allocator);
     defer stream_buf.deinit();
 
-    try tokenizer.tokenize("", &stream_buf);
+    try tokenizer.tokenize(buf, &stream_buf);
 
     const elem = stream_buf.items[0];
     std.debug.print("{}\n", .{elem});
