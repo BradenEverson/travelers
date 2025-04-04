@@ -14,8 +14,6 @@ pub fn main() !void {
         return;
     };
 
-    std.debug.print("{s}\n", .{path});
-
     const file = try std.fs.cwd().openFile(path, .{});
     defer file.close();
 
