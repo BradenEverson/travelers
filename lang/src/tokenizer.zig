@@ -1,6 +1,6 @@
 const std = @import("std");
-const ArrayList = std.ArrayList;
 const PeekableIterator = @import("./tokenizer/peekable.zig").PeekableIterator;
+const ArrayList = std.ArrayList;
 
 pub const Token = struct {
     tag: TokenTag,
