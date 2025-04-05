@@ -1,5 +1,6 @@
 const std = @import("std");
 const tokenizer = @import("./tokenizer.zig");
+const Parser = @import("./parser.zig").Parser;
 
 const ArrayList = std.ArrayList;
 
@@ -27,4 +28,7 @@ pub fn main() !void {
     for (stream_buf.items) |elem| {
         std.debug.print("{}\n", .{elem});
     }
+
+    const parser = Parser{ .stream = stream_buf.items };
+    _ = parser;
 }

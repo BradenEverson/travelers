@@ -49,7 +49,7 @@ pub const TokenTag = union(enum) {
 };
 
 pub fn tokenize(stream: []const u8, buf: *ArrayList(Token)) !void {
-    var peek = PeekableIterator{ .buf = stream };
+    var peek = PeekableIterator(u8){ .buf = stream };
 
     var line: u32 = 1;
     var col: u32 = 1;
