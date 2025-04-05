@@ -20,6 +20,7 @@ pub const Token = struct {
 
 pub const TokenTag = union(enum) {
     ident: []const u8,
+    number: f32,
     plus,
     minus,
     star,
@@ -31,6 +32,10 @@ pub const TokenTag = union(enum) {
         switch (self.*) {
             .ident => |ident| {
                 try writer.print("Identifier: \"{s}\"", .{ident});
+            },
+
+            .number => |n| {
+                try writer.print("Number: \"{d:.2}\"", .{n});
             },
 
             .plus => try writer.print("Plus", .{}),
@@ -70,8 +75,9 @@ pub fn tokenize(stream: []const u8, buf: *ArrayList(Token)) !void {
                 col += 1;
                 continue;
             },
+
             else => ident: {
-                if (std.ascii.isAlphanumeric(tok)) {
+                if (std.ascii.isAlphabetic(tok)) {
                     const start = peek.index - 1;
 
                     while (peek.peek()) |peek_tok| {
@@ -83,8 +89,25 @@ pub fn tokenize(stream: []const u8, buf: *ArrayList(Token)) !void {
                     }
 
                     const end = peek.index;
+                    const word = stream[start..end];
 
-                    break :ident TokenTag{ .ident = stream[start..end] };
+                    break :ident TokenTag{ .ident = word };
+                } else if (isNumeric(tok)) {
+                    const start = peek.index - 1;
+
+                    while (peek.peek()) |peek_tok| {
+                        if (!isNumeric(peek_tok)) {
+                            break;
+                        }
+                        len += 1;
+                        _ = peek.next();
+                    }
+
+                    const end = peek.index;
+                    const word = stream[start..end];
+
+                    const parse = try std.fmt.parseFloat(f32, word);
+                    break :ident TokenTag{ .number = parse };
                 } else {
                     continue;
                 }
@@ -107,4 +130,8 @@ pub fn tokenize(stream: []const u8, buf: *ArrayList(Token)) !void {
         .line = line,
         .len = len,
     });
+}
+
+pub fn isNumeric(tok: u8) bool {
+    return std.ascii.isDigit(tok) or tok == '.';
 }
