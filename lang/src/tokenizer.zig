@@ -2,6 +2,16 @@ const std = @import("std");
 const PeekableIterator = @import("./tokenizer/peekable.zig").PeekableIterator;
 const ArrayList = std.ArrayList;
 
+pub const TokenizeError = error{
+    UnrecognizedToken,
+};
+
+pub const ErrorContext = struct {
+    line: u32,
+    col: u32,
+    len: u32,
+};
+
 pub const Token = struct {
     tag: TokenTag,
     line: u32,
@@ -48,7 +58,7 @@ pub const TokenTag = union(enum) {
     }
 };
 
-pub fn tokenize(stream: []const u8, buf: *ArrayList(Token)) !void {
+pub fn tokenize(stream: []const u8, buf: *ArrayList(Token), err_ctx: *ErrorContext) !void {
     var peek = PeekableIterator(u8){ .buf = stream };
 
     var line: u32 = 1;
@@ -106,10 +116,14 @@ pub fn tokenize(stream: []const u8, buf: *ArrayList(Token)) !void {
                     const end = peek.index;
                     const word = stream[start..end];
 
-                    const parse = try std.fmt.parseFloat(f32, word);
+                    const parse = std.fmt.parseFloat(f32, word) catch unreachable;
+
                     break :ident TokenTag{ .number = parse };
                 } else {
-                    continue;
+                    err_ctx.*.col = col;
+                    err_ctx.*.line = line;
+                    err_ctx.*.len = len;
+                    return error.UnreckognizedToken;
                 }
             },
         };

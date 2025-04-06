@@ -23,7 +23,8 @@ pub fn main() !void {
     var stream_buf = ArrayList(tokenizer.Token).init(allocator);
     defer stream_buf.deinit();
 
-    try tokenizer.tokenize(buf, &stream_buf);
+    var ctx: tokenizer.ErrorContext = undefined;
+    try tokenizer.tokenize(buf, &stream_buf, &ctx);
 
     for (stream_buf.items) |elem| {
         std.debug.print("{}\n", .{elem});
