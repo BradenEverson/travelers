@@ -24,7 +24,16 @@ pub fn main() !void {
     defer stream_buf.deinit();
 
     var ctx: tokenizer.ErrorContext = undefined;
-    try tokenizer.tokenize(buf, &stream_buf, &ctx);
+    tokenizer.tokenize(buf, &stream_buf, &ctx) catch |err| switch (err) {
+        error.UnreckognizedToken => {
+            std.debug.print("Unreckognized Token:\n", .{});
+            return;
+        },
+        else => {
+            std.debug.print("Other Error: {}\n", .{err});
+            return;
+        },
+    };
 
     for (stream_buf.items) |elem| {
         std.debug.print("{}\n", .{elem});
