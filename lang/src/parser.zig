@@ -4,6 +4,10 @@ const tokenizer = @import("./tokenizer.zig");
 const Token = tokenizer.Token;
 const TokenTag = tokenizer.TokenTag;
 
+pub const ParseError = error{};
+
+pub const ParserError = ParseError;
+
 pub const Parser = struct {
     stream: []const Token,
     index: usize = 0,
@@ -20,7 +24,7 @@ pub const Parser = struct {
         }
     }
 
-    pub fn parse(self: *Parser) void {
+    pub fn parse(self: *Parser) ParserError!void {
         _ = self;
     }
 };
