@@ -26,7 +26,8 @@ pub fn main() !void {
     var ctx: tokenizer.ErrorContext = undefined;
     tokenizer.tokenize(buf, &stream_buf, &ctx) catch |err| switch (err) {
         error.UnreckognizedToken => {
-            std.debug.print("Unreckognized Token:\n", .{});
+            const invalid_line = buf[ctx.target_line.@"0"..ctx.target_line.@"1"];
+            std.debug.print("Unreckognized Token:\n{s}\n", .{invalid_line});
             return;
         },
         else => {

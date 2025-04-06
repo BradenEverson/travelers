@@ -7,6 +7,7 @@ pub const TokenError = error{
 };
 
 pub const ErrorContext = struct {
+    target_line: struct { usize, usize },
     line: u32,
     col: u32,
     len: u32,
@@ -67,9 +68,13 @@ pub fn tokenize(stream: []const u8, buf: *ArrayList(Token), err_ctx: *ErrorConte
     var col: u32 = 1;
     var len: u32 = 1;
 
+    var line_start: usize = 0;
+    var line_end: usize = 0;
+
     while (peek.next()) |tok| {
         len = 1;
         col += 1;
+        line_end += 1;
         const next = switch (tok) {
             '+' => .plus,
             '-' => .minus,
@@ -80,11 +85,14 @@ pub fn tokenize(stream: []const u8, buf: *ArrayList(Token), err_ctx: *ErrorConte
             '\n' => {
                 col = 1;
                 line += 1;
+                line_end += 1;
+                line_start = line_end;
                 continue;
             },
 
             '\t', ' ' => {
                 col += 1;
+                line_end += 1;
                 continue;
             },
 
@@ -103,6 +111,9 @@ pub fn tokenize(stream: []const u8, buf: *ArrayList(Token), err_ctx: *ErrorConte
                     const end = peek.index;
                     const word = stream[start..end];
 
+                    col += len;
+                    line_end += len;
+
                     break :ident TokenTag{ .ident = word };
                 } else if (isNumeric(tok)) {
                     const start = peek.index - 1;
@@ -115,6 +126,9 @@ pub fn tokenize(stream: []const u8, buf: *ArrayList(Token), err_ctx: *ErrorConte
                         _ = peek.next();
                     }
 
+                    col += len;
+                    line_end += len;
+
                     const end = peek.index;
                     const word = stream[start..end];
 
@@ -122,9 +136,17 @@ pub fn tokenize(stream: []const u8, buf: *ArrayList(Token), err_ctx: *ErrorConte
 
                     break :ident TokenTag{ .number = parse };
                 } else {
+                    while (peek.next()) |val| {
+                        if (val == '\n') {
+                            break;
+                        }
+                        line_end += 1;
+                    }
+
                     err_ctx.*.col = col;
                     err_ctx.*.line = line;
                     err_ctx.*.len = len;
+                    err_ctx.*.target_line = .{ line_start, line_end };
                     return error.UnreckognizedToken;
                 }
             },
