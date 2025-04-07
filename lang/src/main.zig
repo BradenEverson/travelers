@@ -5,7 +5,13 @@ const Parser = @import("./parser.zig").Parser;
 const ArrayList = std.ArrayList;
 
 pub fn main() !void {
-    const allocator = std.heap.page_allocator;
+    //const allocator = std.heap.page_allocator;
+
+    var gpa = std.heap.GeneralPurposeAllocator(.{}).init;
+    const allocator = gpa.allocator();
+    defer {
+        _ = gpa.deinit();
+    }
 
     var args = std.process.args();
     _ = args.skip();
@@ -19,6 +25,7 @@ pub fn main() !void {
     defer file.close();
 
     const buf = try file.readToEndAlloc(allocator, std.math.maxInt(u32));
+    defer allocator.free(buf);
 
     var stream_buf = ArrayList(tokenizer.Token).init(allocator);
     defer stream_buf.deinit();
