@@ -32,4 +32,9 @@ pub const Parser = struct {
         }
         @panic("todo");
     }
+
+    pub fn deinit(self: *Parser, expr: []const Expression) void {
+        _ = self;
+        _ = expr;
+    }
 };

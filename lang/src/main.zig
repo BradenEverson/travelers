@@ -66,5 +66,5 @@ pub fn main() !void {
 
     var parser = Parser{ .stream = stream_buf.items, .allocator = allocator };
     const expr = parser.parse() catch |err| switch (err) {};
-    _ = expr;
+    defer parser.deinit(expr);
 }
