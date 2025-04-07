@@ -57,10 +57,6 @@ pub fn main() !void {
         },
     };
 
-    for (stream_buf.items) |elem| {
-        std.debug.print("{}\n", .{elem});
-    }
-
-    const parser = Parser{ .stream = stream_buf.items };
-    _ = parser;
+    var parser = Parser{ .stream = stream_buf.items };
+    parser.parse(allocator) catch |err| switch (err) {};
 }

@@ -24,7 +24,10 @@ pub const Parser = struct {
         }
     }
 
-    pub fn parse(self: *Parser) ParserError!void {
-        _ = self;
+    pub fn parse(self: *Parser, allocator: std.mem.Allocator) ParserError!void {
+        _ = allocator;
+        for (self.stream) |elem| {
+            std.debug.print("{}\n", .{elem});
+        }
     }
 };
