@@ -1,5 +1,6 @@
 const std = @import("std");
 const tokenizer = @import("./tokenizer.zig");
+const Expression = @import("./parser/expression.zig").Expression;
 
 const Token = tokenizer.Token;
 const TokenTag = tokenizer.TokenTag;
@@ -25,9 +26,10 @@ pub const Parser = struct {
         }
     }
 
-    pub fn parse(self: *Parser) ParserError!void {
+    pub fn parse(self: *Parser) ParserError!Expression {
         for (self.stream) |elem| {
             std.debug.print("{}\n", .{elem});
         }
+        @panic("todo");
     }
 };
