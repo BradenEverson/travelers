@@ -42,7 +42,7 @@ pub fn main() !void {
             std.debug.print(" -> {s}:{d}:{d}\n", .{ path, ctx.line, ctx.col });
             std.debug.print(" | {s}\n", .{invalid_line});
 
-            var underline = std.ArrayList(u8).init(std.heap.page_allocator);
+            var underline = std.ArrayList(u8).init(allocator);
             defer underline.deinit();
 
             var i: usize = 1;
