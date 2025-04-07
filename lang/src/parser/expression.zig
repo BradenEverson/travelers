@@ -1,7 +1,7 @@
 pub const Expression = union(enum) {
     literal: Literal,
-    binary_op: struct { *Expression, BinaryOp, *Expression },
-    unary_op: struct { *Expression, UnaryOp },
+    binary_op: struct { *const Expression, BinaryOp, *const Expression },
+    unary_op: struct { *const Expression, UnaryOp },
 };
 
 pub const Literal = union(enum) {

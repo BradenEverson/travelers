@@ -65,11 +65,11 @@ pub fn main() !void {
         },
     };
 
-    var arena = std.heap.ArenaAllocator.init(allocator);
-    defer arena.deinit();
-
     var statements = ArrayList(Expression).init(allocator);
     defer statements.deinit();
+
+    var arena = std.heap.ArenaAllocator.init(allocator);
+    defer arena.deinit();
 
     var parser = Parser{ .stream = stream_buf.items, .allocator = arena };
     parser.parse(&statements) catch |err| switch (err) {};

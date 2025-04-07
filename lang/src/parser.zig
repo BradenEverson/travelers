@@ -30,6 +30,10 @@ pub const Parser = struct {
         for (self.stream) |elem| {
             std.debug.print("{}\n", .{elem});
         }
+
+        const expr = Expression{ .binary_op = .{ &Expression{ .literal = .{ .number = 10.0 } }, .add, &Expression{ .literal = .{ .number = 10.0 } } } };
+
+        _ = expr;
         _ = statements;
     }
 };
