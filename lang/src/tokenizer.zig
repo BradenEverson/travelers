@@ -152,15 +152,15 @@ pub fn tokenize(stream: []const u8, buf: *ArrayList(Token), err_ctx: *ErrorConte
             },
         };
 
-        current_line_end += 1;
-        col += 1;
-
         const token = Token{
             .tag = next,
             .col = col,
             .line = line,
             .len = len,
         };
+
+        current_line_end += 1;
+        col += 1;
 
         try buf.append(token);
     }
