@@ -26,8 +26,29 @@ pub fn main() !void {
     var ctx: tokenizer.ErrorContext = undefined;
     tokenizer.tokenize(buf, &stream_buf, &ctx) catch |err| switch (err) {
         error.UnreckognizedToken => {
-            const invalid_line = buf[ctx.target_line.@"0"..ctx.target_line.@"1"];
-            std.debug.print("Unreckognized Token:\n{s}\n", .{invalid_line});
+            const line_start = ctx.target_line.@"0";
+            const line_end = ctx.target_line.@"1";
+            const invalid_line = buf[line_start..line_end];
+            const invalid_token = ctx.token;
+
+            std.debug.print("token error: Unrecognized Token `{c}`\n", .{invalid_token});
+            std.debug.print(" -> {s}:{d}:{d}\n", .{ path, ctx.line, ctx.col });
+            std.debug.print(" | {s}\n", .{invalid_line});
+
+            var underline = std.ArrayList(u8).init(std.heap.page_allocator);
+            defer underline.deinit();
+
+            var i: usize = 1;
+            while (i < ctx.col) : (i += 1) {
+                try underline.append(' ');
+            }
+
+            i = 0;
+            while (i < ctx.len) : (i += 1) {
+                try underline.append('~');
+            }
+
+            std.debug.print(" | {s}\n", .{underline.items});
             return;
         },
         else => {

@@ -8,6 +8,7 @@ pub const TokenError = error{
 
 pub const ErrorContext = struct {
     target_line: struct { usize, usize },
+    token: u8,
     line: u32,
     col: u32,
     len: u32,
@@ -69,12 +70,10 @@ pub fn tokenize(stream: []const u8, buf: *ArrayList(Token), err_ctx: *ErrorConte
     var len: u32 = 1;
 
     var line_start: usize = 0;
-    var line_end: usize = 0;
+    var current_line_end: usize = 0;
 
     while (peek.next()) |tok| {
         len = 1;
-        col += 1;
-        line_end += 1;
         const next = switch (tok) {
             '+' => .plus,
             '-' => .minus,
@@ -85,14 +84,14 @@ pub fn tokenize(stream: []const u8, buf: *ArrayList(Token), err_ctx: *ErrorConte
             '\n' => {
                 col = 1;
                 line += 1;
-                line_end += 1;
-                line_start = line_end;
+                current_line_end += 1;
+                line_start = current_line_end;
                 continue;
             },
 
             '\t', ' ' => {
                 col += 1;
-                line_end += 1;
+                current_line_end += 1;
                 continue;
             },
 
@@ -111,8 +110,8 @@ pub fn tokenize(stream: []const u8, buf: *ArrayList(Token), err_ctx: *ErrorConte
                     const end = peek.index;
                     const word = stream[start..end];
 
-                    col += len;
-                    line_end += len;
+                    col += len - 1;
+                    current_line_end += len - 1;
 
                     break :ident TokenTag{ .ident = word };
                 } else if (isNumeric(tok)) {
@@ -126,8 +125,8 @@ pub fn tokenize(stream: []const u8, buf: *ArrayList(Token), err_ctx: *ErrorConte
                         _ = peek.next();
                     }
 
-                    col += len;
-                    line_end += len;
+                    col += len - 1;
+                    current_line_end += len - 1;
 
                     const end = peek.index;
                     const word = stream[start..end];
@@ -136,21 +135,25 @@ pub fn tokenize(stream: []const u8, buf: *ArrayList(Token), err_ctx: *ErrorConte
 
                     break :ident TokenTag{ .number = parse };
                 } else {
-                    while (peek.next()) |val| {
-                        if (val == '\n') {
-                            break;
-                        }
-                        line_end += 1;
+                    var error_end = current_line_end;
+                    while (peek.peek()) |val| {
+                        error_end += 1;
+                        if (val == '\n') break;
+                        _ = peek.next();
                     }
 
                     err_ctx.*.col = col;
+                    err_ctx.*.token = tok;
                     err_ctx.*.line = line;
                     err_ctx.*.len = len;
-                    err_ctx.*.target_line = .{ line_start, line_end };
+                    err_ctx.*.target_line = .{ line_start, error_end };
                     return error.UnreckognizedToken;
                 }
             },
         };
+
+        current_line_end += 1;
+        col += 1;
 
         const token = Token{
             .tag = next,
