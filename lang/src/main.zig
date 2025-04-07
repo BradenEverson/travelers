@@ -57,6 +57,6 @@ pub fn main() !void {
         },
     };
 
-    var parser = Parser{ .stream = stream_buf.items };
-    parser.parse(allocator) catch |err| switch (err) {};
+    var parser = Parser{ .stream = stream_buf.items, .allocator = allocator };
+    parser.parse() catch |err| switch (err) {};
 }

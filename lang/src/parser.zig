@@ -11,6 +11,7 @@ pub const ParserError = ParseError;
 pub const Parser = struct {
     stream: []const Token,
     index: usize = 0,
+    allocator: std.mem.Allocator,
 
     fn peek(self: *Parser) TokenTag {
         return self.stream[self.index].tag;
@@ -24,8 +25,7 @@ pub const Parser = struct {
         }
     }
 
-    pub fn parse(self: *Parser, allocator: std.mem.Allocator) ParserError!void {
-        _ = allocator;
+    pub fn parse(self: *Parser) ParserError!void {
         for (self.stream) |elem| {
             std.debug.print("{}\n", .{elem});
         }
