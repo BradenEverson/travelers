@@ -1,6 +1,7 @@
 const std = @import("std");
 const tokenizer = @import("./tokenizer.zig");
 const Parser = @import("./parser.zig").Parser;
+const Expression = @import("./parser/expression.zig").Expression;
 
 const ArrayList = std.ArrayList;
 
@@ -64,7 +65,12 @@ pub fn main() !void {
         },
     };
 
-    var parser = Parser{ .stream = stream_buf.items, .allocator = allocator };
-    const expr = parser.parse() catch |err| switch (err) {};
-    defer parser.deinit(expr);
+    var arena = std.heap.ArenaAllocator.init(allocator);
+    defer arena.deinit();
+
+    var statements = ArrayList(Expression).init(allocator);
+    defer statements.deinit();
+
+    var parser = Parser{ .stream = stream_buf.items, .allocator = arena };
+    parser.parse(&statements) catch |err| switch (err) {};
 }

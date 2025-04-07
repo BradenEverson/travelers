@@ -12,7 +12,7 @@ pub const ParserError = ParseError;
 pub const Parser = struct {
     stream: []const Token,
     index: usize = 0,
-    allocator: std.mem.Allocator,
+    allocator: std.heap.ArenaAllocator,
 
     fn peek(self: *Parser) TokenTag {
         return self.stream[self.index].tag;
@@ -26,15 +26,10 @@ pub const Parser = struct {
         }
     }
 
-    pub fn parse(self: *Parser) ParserError!Expression {
+    pub fn parse(self: *Parser, statements: *std.ArrayList(Expression)) ParserError!void {
         for (self.stream) |elem| {
             std.debug.print("{}\n", .{elem});
         }
-        @panic("todo");
-    }
-
-    pub fn deinit(self: *Parser, expr: []const Expression) void {
-        _ = self;
-        _ = expr;
+        _ = statements;
     }
 };
