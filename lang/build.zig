@@ -20,4 +20,7 @@ pub fn build(b: *std.Build) void {
     }
 
     run_step.dependOn(&run_cmd.step);
+
+    const wasm_step = b.step("wasm", "Build for wasm");
+    _ = wasm_step;
 }

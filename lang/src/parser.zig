@@ -59,6 +59,6 @@ pub const Parser = struct {
 
     fn expression(self: *Parser) ParserError!Expression {
         _ = self;
-        @panic("Todo!");
+        return ParserError.ExpectedTokenFound;
     }
 };
