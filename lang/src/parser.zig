@@ -5,7 +5,7 @@ const Expression = @import("./parser/expression.zig").Expression;
 const Token = tokenizer.Token;
 const TokenTag = tokenizer.TokenTag;
 
-pub const ParseError = error{};
+pub const ParseError = error{ExpectedTokenFound};
 
 pub const ParserError = ParseError || std.mem.Allocator.Error;
 
@@ -26,6 +26,15 @@ pub const Parser = struct {
         }
     }
 
+    fn consume(self: *Parser, tok: TokenTag) ParserError!void {
+        if (std.meta.eql(self.peek(), tok)) {
+            self.advance();
+            return;
+        } else {
+            return ParserError.ExpectedTokenFound;
+        }
+    }
+
     fn at_end(self: *Parser) bool {
         return self.peek() == .eof;
     }
@@ -40,7 +49,11 @@ pub const Parser = struct {
     fn statement(self: *Parser) ParserError!Expression {
         const tag = self.peek();
         return switch (tag) {
-            else => try self.expression(),
+            else => expr: {
+                const e = try self.expression();
+                try self.consume(.semicolon);
+                break :expr e;
+            },
         };
     }
 
