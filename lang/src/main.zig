@@ -60,7 +60,7 @@ pub fn main() !void {
             return;
         },
         else => {
-            std.debug.print("Other Error: {}\n", .{err});
+            std.debug.print("Other Error During Tokenizing: {}\n", .{err});
             return;
         },
     };
@@ -72,5 +72,10 @@ pub fn main() !void {
     defer arena.deinit();
 
     var parser = Parser{ .stream = stream_buf.items, .allocator = arena };
-    parser.parse(&statements) catch |err| switch (err) {};
+    parser.parse(&statements) catch |err| switch (err) {
+        else => {
+            std.debug.print("Other Error During Parsing: {}\n", .{err});
+            return;
+        },
+    };
 }

@@ -7,7 +7,7 @@ const TokenTag = tokenizer.TokenTag;
 
 pub const ParseError = error{};
 
-pub const ParserError = ParseError;
+pub const ParserError = ParseError || std.mem.Allocator.Error;
 
 pub const Parser = struct {
     stream: []const Token,
@@ -26,14 +26,26 @@ pub const Parser = struct {
         }
     }
 
+    fn at_end(self: *Parser) bool {
+        return self.peek() == .eof;
+    }
+
     pub fn parse(self: *Parser, statements: *std.ArrayList(Expression)) ParserError!void {
-        for (self.stream) |elem| {
-            std.debug.print("{}\n", .{elem});
+        while (!self.at_end()) : (self.advance()) {
+            const s = try self.statement();
+            try statements.append(s);
         }
+    }
 
-        const expr = Expression{ .binary_op = .{ &Expression{ .literal = .{ .number = 10.0 } }, .add, &Expression{ .literal = .{ .number = 10.0 } } } };
+    fn statement(self: *Parser) ParserError!Expression {
+        const tag = self.peek();
+        return switch (tag) {
+            else => try self.expression(),
+        };
+    }
 
-        _ = expr;
-        _ = statements;
+    fn expression(self: *Parser) ParserError!Expression {
+        _ = self;
+        @panic("Todo!");
     }
 };
