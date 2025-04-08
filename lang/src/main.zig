@@ -70,8 +70,9 @@ pub fn main() !void {
 
     var arena = std.heap.ArenaAllocator.init(allocator);
     defer arena.deinit();
+    const arena_alloc = arena.allocator();
 
-    var parser = Parser{ .stream = stream_buf.items, .allocator = arena };
+    var parser = Parser{ .stream = stream_buf.items, .allocator = arena_alloc };
     parser.parse(&statements) catch |err| switch (err) {
         else => {
             std.debug.print("Other Error During Parsing: {}\n", .{err});

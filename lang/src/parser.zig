@@ -12,7 +12,7 @@ pub const ParserError = ParseError || std.mem.Allocator.Error;
 pub const Parser = struct {
     stream: []const Token,
     index: usize = 0,
-    allocator: std.heap.ArenaAllocator,
+    allocator: std.mem.Allocator,
 
     fn peek(self: *Parser) TokenTag {
         return self.stream[self.index].tag;
