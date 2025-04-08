@@ -65,7 +65,7 @@ pub fn main() !void {
         },
     };
 
-    var statements = ArrayList(Expression).init(allocator);
+    var statements = ArrayList(*Expression).init(allocator);
     defer statements.deinit();
 
     var arena = std.heap.ArenaAllocator.init(allocator);

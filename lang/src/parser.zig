@@ -39,14 +39,14 @@ pub const Parser = struct {
         return self.peek() == .eof;
     }
 
-    pub fn parse(self: *Parser, statements: *std.ArrayList(Expression)) ParserError!void {
+    pub fn parse(self: *Parser, statements: *std.ArrayList(*Expression)) ParserError!void {
         while (!self.at_end()) : (self.advance()) {
             const s = try self.statement();
             try statements.append(s);
         }
     }
 
-    fn statement(self: *Parser) ParserError!Expression {
+    fn statement(self: *Parser) ParserError!*Expression {
         const tag = self.peek();
         return switch (tag) {
             else => expr: {
@@ -57,8 +57,14 @@ pub const Parser = struct {
         };
     }
 
-    fn expression(self: *Parser) ParserError!Expression {
+    fn expression(self: *Parser) ParserError!*Expression {
+        return switch (self.peek()) {
+            else => try self.equality(),
+        };
+    }
+
+    fn equality(self: *Parser) ParserError!*Expression {
         _ = self;
-        return ParserError.ExpectedTokenFound;
+        @panic("todo");
     }
 };
