@@ -34,6 +34,14 @@ pub const TokenTag = union(enum) {
     ident: []const u8,
     number: f32,
     plus,
+    bang,
+    bangequal,
+    equalequal,
+    equals,
+    gt,
+    gte,
+    lt,
+    lte,
     minus,
     star,
     slash,
@@ -52,6 +60,14 @@ pub const TokenTag = union(enum) {
 
             .plus => try writer.print("Plus", .{}),
             .minus => try writer.print("Minus", .{}),
+            .bang => try writer.print("Bang", .{}),
+            .bangequal => try writer.print("Inequality", .{}),
+            .equalequal => try writer.print("Equality", .{}),
+            .equals => try writer.print("Equals", .{}),
+            .gt => try writer.print("GT", .{}),
+            .gte => try writer.print("GTE", .{}),
+            .lt => try writer.print("LT", .{}),
+            .lte => try writer.print("LTE", .{}),
             .star => try writer.print("Star", .{}),
             .semicolon => try writer.print("Semicolon", .{}),
             .slash => try writer.print("Slash", .{}),
@@ -74,12 +90,48 @@ pub fn tokenize(stream: []const u8, buf: *ArrayList(Token), err_ctx: *ErrorConte
 
     while (peek.next()) |tok| {
         len = 1;
-        const next = switch (tok) {
+        const next: TokenTag = switch (tok) {
             '+' => .plus,
             '-' => .minus,
             '/' => .slash,
             '*' => .star,
             ';' => .semicolon,
+
+            '<' => lt: {
+                if (peek.peek() == '=') {
+                    _ = peek.next();
+                    break :lt .lte;
+                } else {
+                    break :lt .lt;
+                }
+            },
+
+            '>' => gt: {
+                if (peek.peek() == '=') {
+                    _ = peek.next();
+                    break :gt .gte;
+                } else {
+                    break :gt .gt;
+                }
+            },
+
+            '!' => bang: {
+                if (peek.peek() == '=') {
+                    _ = peek.next();
+                    break :bang .bangequal;
+                } else {
+                    break :bang .bang;
+                }
+            },
+
+            '=' => eq: {
+                if (peek.peek() == '=') {
+                    _ = peek.next();
+                    break :eq .equalequal;
+                } else {
+                    break :eq .equals;
+                }
+            },
 
             '\n' => {
                 col = 1;

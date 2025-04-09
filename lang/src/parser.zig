@@ -64,8 +64,10 @@ pub const Parser = struct {
     }
 
     fn equality(self: *Parser) ParserError!*Expression {
-        _ = self;
-        @panic("todo");
+        const expr = try self.allocator.create(Expression);
+        expr.* = (try self.comparison()).*;
+
+        return expr;
     }
 
     fn comparison(self: *Parser) ParserError!*Expression {
