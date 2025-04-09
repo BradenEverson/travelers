@@ -68,6 +68,10 @@ pub fn main() !void {
     var statements = ArrayList(*Expression).init(allocator);
     defer statements.deinit();
 
+    for (stream_buf.items) |token| {
+        std.debug.print("{}\n", .{token});
+    }
+
     var parser = Parser.init(stream_buf.items, allocator);
     defer parser.deinit();
 

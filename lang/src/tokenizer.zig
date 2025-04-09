@@ -36,13 +36,24 @@ pub const Keyword = enum {
     up,
     down,
 
+    const mappings = std.StaticStringMap(Keyword).initComptime(.{
+        .{ "left", .left },
+        .{ "right", .right },
+        .{ "up", .up },
+        .{ "down", .down },
+    });
+
     pub fn format(self: *const Keyword, _: []const u8, _: std.fmt.FormatOptions, writer: anytype) !void {
         switch (self.*) {
-            .left => try writer.print("left"),
-            .right => try writer.print("right"),
-            .up => try writer.print("up"),
-            .down => try writer.print("down"),
+            .left => try writer.print("left", .{}),
+            .right => try writer.print("right", .{}),
+            .up => try writer.print("up", .{}),
+            .down => try writer.print("down", .{}),
         }
+    }
+
+    pub fn tryFromString(string: []const u8) ?Keyword {
+        return mappings.get(string);
     }
 };
 
@@ -186,7 +197,11 @@ pub fn tokenize(stream: []const u8, buf: *ArrayList(Token), err_ctx: *ErrorConte
                     col += len - 1;
                     current_line_end += len - 1;
 
-                    break :ident TokenTag{ .ident = word };
+                    if (Keyword.tryFromString(word)) |keyword| {
+                        break :ident TokenTag{ .keyword = keyword };
+                    } else {
+                        break :ident TokenTag{ .ident = word };
+                    }
                 } else if (isNumeric(tok)) {
                     const start = peek.index - 1;
 
