@@ -28,7 +28,37 @@ pub const Expression = union(enum) {
             .unary_op => |un| {
                 try writer.print("{} {}", .{ un.@"1", un.@"0" });
             },
-            else => try writer.print("not done yet", .{}),
+
+            .move_left => |e| {
+                if (e) |ex| {
+                    try writer.print("left {}", .{ex});
+                } else {
+                    try writer.print("left", .{});
+                }
+            },
+            .move_right => |e| {
+                if (e) |ex| {
+                    try writer.print("right {}", .{ex});
+                } else {
+                    try writer.print("right", .{});
+                }
+            },
+
+            .move_up => |e| {
+                if (e) |ex| {
+                    try writer.print("up {}", .{ex});
+                } else {
+                    try writer.print("up", .{});
+                }
+            },
+
+            .move_down => |e| {
+                if (e) |ex| {
+                    try writer.print("down {}", .{ex});
+                } else {
+                    try writer.print("down", .{});
+                }
+            },
         }
     }
 };
