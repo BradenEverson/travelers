@@ -6,6 +6,8 @@ pub const Expression = union(enum) {
     move_up: ?*const Expression,
     move_down: ?*const Expression,
 
+    grouping: *const Expression,
+
     literal: Literal,
     binary_op: struct { *const Expression, BinaryOp, *const Expression },
     unary_op: struct { *const Expression, UnaryOp },
@@ -17,6 +19,10 @@ pub const Expression = union(enum) {
         writer: anytype,
     ) !void {
         switch (self.*) {
+            .grouping => |inner| {
+                try writer.print("({})", .{inner});
+            },
+
             .literal => |lit| {
                 try writer.print("{}", .{lit});
             },

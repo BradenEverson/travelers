@@ -249,15 +249,26 @@ pub const Parser = struct {
     fn primary(self: *Parser) ParserError!*Expression {
         const prim = val: switch (self.peek()) {
             .number => |n| {
+                self.advance();
                 const num = try self.allocator().create(Expression);
                 num.* = .{ .literal = .{ .number = n } };
 
                 break :val num;
             },
+            .openparen => {
+                self.advance();
+                const inner = try self.equality();
+
+                const grouping = try self.allocator().create(Expression);
+                grouping.* = .{ .grouping = inner };
+
+                try self.consume(.closeparen);
+
+                break :val grouping;
+            },
             else => error.ExpectedTokenFound,
         };
 
-        self.advance();
         return prim;
     }
 };

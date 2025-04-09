@@ -74,6 +74,8 @@ pub const TokenTag = union(enum) {
     star,
     slash,
     semicolon,
+    openparen,
+    closeparen,
     eof,
 
     pub fn format(self: *const TokenTag, _: []const u8, _: std.fmt.FormatOptions, writer: anytype) !void {
@@ -99,6 +101,8 @@ pub const TokenTag = union(enum) {
             .gt => try writer.print("GT", .{}),
             .gte => try writer.print("GTE", .{}),
             .lt => try writer.print("LT", .{}),
+            .openparen => try writer.print("OpenParen", .{}),
+            .closeparen => try writer.print("CloseParen", .{}),
             .lte => try writer.print("LTE", .{}),
             .star => try writer.print("Star", .{}),
             .semicolon => try writer.print("Semicolon", .{}),
@@ -128,6 +132,9 @@ pub fn tokenize(stream: []const u8, buf: *ArrayList(Token), err_ctx: *ErrorConte
             '/' => .slash,
             '*' => .star,
             ';' => .semicolon,
+
+            '(' => .openparen,
+            ')' => .closeparen,
 
             '<' => lt: {
                 if (peek.peek() == '=') {
