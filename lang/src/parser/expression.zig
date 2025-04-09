@@ -10,5 +10,5 @@ pub const Literal = union(enum) {
     boolean: bool,
 };
 
-pub const BinaryOp = enum { add, sub, mul, div };
+pub const BinaryOp = enum { add, sub, mul, div, equal, not_equal, gt, gte, lt, lte };
 pub const UnaryOp = enum { not, neg };

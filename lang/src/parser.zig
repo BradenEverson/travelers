@@ -1,6 +1,9 @@
 const std = @import("std");
 const tokenizer = @import("./tokenizer.zig");
-const Expression = @import("./parser/expression.zig").Expression;
+const expression = @import("./parser/expression.zig");
+const Expression = expression.Expression;
+const BinaryOp = expression.BinaryOp;
+const UnaryOp = expression.UnaryOp;
 
 const Token = tokenizer.Token;
 const TokenTag = tokenizer.TokenTag;
@@ -64,30 +67,155 @@ pub const Parser = struct {
     }
 
     fn equality(self: *Parser) ParserError!*Expression {
-        const expr = try self.allocator.create(Expression);
-        expr.* = (try self.comparison()).*;
+        var expr = try self.comparison();
+
+        grow: switch (self.peek()) {
+            .equalequal, .bangequal => {
+                const op: BinaryOp = switch (self.peek()) {
+                    .equalequal => .equal,
+                    .bangequal => .not_equal,
+                    else => unreachable,
+                };
+                _ = self.advance();
+
+                const right = try self.comparison();
+
+                const new_expr = try self.allocator.create(Expression);
+                new_expr.* = .{
+                    .binary_op = .{
+                        expr,
+                        op,
+                        right,
+                    },
+                };
+                expr = new_expr;
+                continue :grow self.peek();
+            },
+            else => {},
+        }
 
         return expr;
     }
 
     fn comparison(self: *Parser) ParserError!*Expression {
-        _ = self;
-        @panic("todo");
+        var expr = try self.term();
+
+        grow: switch (self.peek()) {
+            .gt, .gte, .lt, .lte => {
+                const op: BinaryOp = switch (self.peek()) {
+                    .gt => .gt,
+                    .lt => .lt,
+                    .gte => .gte,
+                    .lte => .lte,
+
+                    else => unreachable,
+                };
+                _ = self.advance();
+
+                const right = try self.term();
+
+                const new_expr = try self.allocator.create(Expression);
+                new_expr.* = .{
+                    .binary_op = .{
+                        expr,
+                        op,
+                        right,
+                    },
+                };
+                expr = new_expr;
+                continue :grow self.peek();
+            },
+            else => {},
+        }
+
+        return expr;
     }
 
     fn term(self: *Parser) ParserError!*Expression {
-        _ = self;
-        @panic("todo");
+        var expr = try self.factor();
+
+        grow: switch (self.peek()) {
+            .plus, .minus => {
+                const op: BinaryOp = switch (self.peek()) {
+                    .plus => .add,
+                    .minus => .sub,
+
+                    else => unreachable,
+                };
+                _ = self.advance();
+
+                const right = try self.factor();
+
+                const new_expr = try self.allocator.create(Expression);
+                new_expr.* = .{
+                    .binary_op = .{
+                        expr,
+                        op,
+                        right,
+                    },
+                };
+                expr = new_expr;
+                continue :grow self.peek();
+            },
+            else => {},
+        }
+
+        return expr;
     }
 
     fn factor(self: *Parser) ParserError!*Expression {
-        _ = self;
-        @panic("todo");
+        var expr = try self.unary();
+
+        grow: switch (self.peek()) {
+            .plus, .minus => {
+                const op: BinaryOp = switch (self.peek()) {
+                    .star => .mul,
+                    .slash => .div,
+
+                    else => unreachable,
+                };
+                _ = self.advance();
+
+                const right = try self.unary();
+
+                const new_expr = try self.allocator.create(Expression);
+                new_expr.* = .{
+                    .binary_op = .{
+                        expr,
+                        op,
+                        right,
+                    },
+                };
+                expr = new_expr;
+                continue :grow self.peek();
+            },
+            else => {},
+        }
+
+        return expr;
     }
 
     fn unary(self: *Parser) ParserError!*Expression {
-        _ = self;
-        @panic("todo");
+        switch (self.peek()) {
+            .bang, .minus => {
+                const op: UnaryOp = switch (self.peek()) {
+                    .bang => .not,
+                    .minus => .neg,
+                    else => unreachable,
+                };
+                self.advance();
+
+                const un = try self.unary();
+
+                const new_expr = try self.allocator.create(Expression);
+                new_expr.* = .{
+                    .unary_op = .{ un, op },
+                };
+
+                return new_expr;
+            },
+            else => return self.primary(),
+        }
     }
 
     fn primary(self: *Parser) ParserError!*Expression {
