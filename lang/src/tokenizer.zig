@@ -30,8 +30,25 @@ pub const Token = struct {
     }
 };
 
+pub const Keyword = enum {
+    left,
+    right,
+    up,
+    down,
+
+    pub fn format(self: *const Keyword, _: []const u8, _: std.fmt.FormatOptions, writer: anytype) !void {
+        switch (self.*) {
+            .left => try writer.print("left"),
+            .right => try writer.print("right"),
+            .up => try writer.print("up"),
+            .down => try writer.print("down"),
+        }
+    }
+};
+
 pub const TokenTag = union(enum) {
     ident: []const u8,
+    keyword: Keyword,
     number: f32,
     plus,
     bang,
@@ -56,6 +73,10 @@ pub const TokenTag = union(enum) {
 
             .number => |n| {
                 try writer.print("Number: \"{d:.2}\"", .{n});
+            },
+
+            .keyword => |k| {
+                try writer.print("Keyword: \"{}\"", .{k});
             },
 
             .plus => try writer.print("Plus", .{}),
