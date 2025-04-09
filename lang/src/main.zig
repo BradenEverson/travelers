@@ -73,10 +73,15 @@ pub fn main() !void {
     const arena_alloc = arena.allocator();
 
     var parser = Parser{ .stream = stream_buf.items, .allocator = arena_alloc };
+
     parser.parse(&statements) catch |err| switch (err) {
         else => {
             std.debug.print("Other Error During Parsing: {}\n", .{err});
             return;
         },
     };
+
+    for (statements.items) |statement| {
+        std.debug.print("{}\n", .{statement});
+    }
 }

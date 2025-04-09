@@ -22,7 +22,7 @@ pub const Parser = struct {
     }
 
     fn advance(self: *Parser) void {
-        if (self.index >= self.stream.len) {
+        if (self.index >= self.stream.len - 1) {
             self.index = self.stream.len - 1;
         } else {
             self.index += 1;
@@ -76,7 +76,7 @@ pub const Parser = struct {
                     .bangequal => .not_equal,
                     else => unreachable,
                 };
-                _ = self.advance();
+                self.advance();
 
                 const right = try self.comparison();
 
@@ -110,7 +110,7 @@ pub const Parser = struct {
 
                     else => unreachable,
                 };
-                _ = self.advance();
+                self.advance();
 
                 const right = try self.term();
 
@@ -142,7 +142,7 @@ pub const Parser = struct {
 
                     else => unreachable,
                 };
-                _ = self.advance();
+                self.advance();
 
                 const right = try self.factor();
 
@@ -174,7 +174,7 @@ pub const Parser = struct {
 
                     else => unreachable,
                 };
-                _ = self.advance();
+                self.advance();
 
                 const right = try self.unary();
 
@@ -219,7 +219,17 @@ pub const Parser = struct {
     }
 
     fn primary(self: *Parser) ParserError!*Expression {
-        _ = self;
-        @panic("todo");
+        const prim = val: switch (self.peek()) {
+            .number => |n| {
+                const num = try self.allocator.create(Expression);
+                num.* = .{ .literal = .{ .number = n } };
+
+                break :val num;
+            },
+            else => error.ExpectedTokenFound,
+        };
+
+        self.advance();
+        return prim;
     }
 };
