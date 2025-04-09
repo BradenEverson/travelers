@@ -67,4 +67,29 @@ pub const Parser = struct {
         _ = self;
         @panic("todo");
     }
+
+    fn comparison(self: *Parser) ParserError!*Expression {
+        _ = self;
+        @panic("todo");
+    }
+
+    fn term(self: *Parser) ParserError!*Expression {
+        _ = self;
+        @panic("todo");
+    }
+
+    fn factor(self: *Parser) ParserError!*Expression {
+        _ = self;
+        @panic("todo");
+    }
+
+    fn unary(self: *Parser) ParserError!*Expression {
+        _ = self;
+        @panic("todo");
+    }
+
+    fn primary(self: *Parser) ParserError!*Expression {
+        _ = self;
+        @panic("todo");
+    }
 };
