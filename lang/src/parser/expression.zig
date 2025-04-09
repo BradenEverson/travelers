@@ -24,6 +24,10 @@ pub const Expression = union(enum) {
             .binary_op => |bin| {
                 try writer.print("{} {} {}", .{ bin.@"0", bin.@"1", bin.@"2" });
             },
+
+            .unary_op => |un| {
+                try writer.print("{} {}", .{ un.@"1", un.@"0" });
+            },
             else => try writer.print("not done yet", .{}),
         }
     }
@@ -83,4 +87,19 @@ pub const BinaryOp = enum {
         }
     }
 };
-pub const UnaryOp = enum { not, neg };
+pub const UnaryOp = enum {
+    not,
+    neg,
+
+    pub fn format(
+        self: *const UnaryOp,
+        _: []const u8,
+        _: std.fmt.FormatOptions,
+        writer: anytype,
+    ) !void {
+        switch (self.*) {
+            .not => try writer.print("!", .{}),
+            .neg => try writer.print("-", .{}),
+        }
+    }
+};
