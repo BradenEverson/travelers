@@ -78,7 +78,10 @@ pub const Parser = struct {
         const tag = self.peek();
         switch (tag) {
             .keyword => |key| switch (key) {
-                .up, .down, .left, .right => @panic("Move action"),
+                .left => @panic("impl left"),
+                .right => @panic("impl right"),
+                .up => @panic("impl up"),
+                .down => @panic("impl down"),
             },
             else => {},
         }
