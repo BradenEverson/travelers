@@ -15,7 +15,22 @@ pub const ParserError = ParseError || std.mem.Allocator.Error;
 pub const Parser = struct {
     stream: []const Token,
     index: usize = 0,
-    allocator: std.mem.Allocator,
+    arena: std.heap.ArenaAllocator,
+
+    pub fn init(stream: []const Token, child_allocator: std.mem.Allocator) Parser {
+        return Parser{
+            .stream = stream,
+            .arena = std.heap.ArenaAllocator.init(child_allocator),
+        };
+    }
+
+    fn allocator(self: *Parser) std.mem.Allocator {
+        return self.arena.allocator();
+    }
+
+    pub fn deinit(self: *Parser) void {
+        self.arena.deinit();
+    }
 
     fn peek(self: *Parser) TokenTag {
         return self.stream[self.index].tag;
@@ -80,7 +95,7 @@ pub const Parser = struct {
 
                 const right = try self.comparison();
 
-                const new_expr = try self.allocator.create(Expression);
+                const new_expr = try self.allocator().create(Expression);
                 new_expr.* = .{
                     .binary_op = .{
                         expr,
@@ -114,7 +129,7 @@ pub const Parser = struct {
 
                 const right = try self.term();
 
-                const new_expr = try self.allocator.create(Expression);
+                const new_expr = try self.allocator().create(Expression);
                 new_expr.* = .{
                     .binary_op = .{
                         expr,
@@ -146,7 +161,7 @@ pub const Parser = struct {
 
                 const right = try self.factor();
 
-                const new_expr = try self.allocator.create(Expression);
+                const new_expr = try self.allocator().create(Expression);
                 new_expr.* = .{
                     .binary_op = .{
                         expr,
@@ -167,7 +182,7 @@ pub const Parser = struct {
         var expr = try self.unary();
 
         grow: switch (self.peek()) {
-            .plus, .minus => {
+            .star, .slash => {
                 const op: BinaryOp = switch (self.peek()) {
                     .star => .mul,
                     .slash => .div,
@@ -178,7 +193,7 @@ pub const Parser = struct {
 
                 const right = try self.unary();
 
-                const new_expr = try self.allocator.create(Expression);
+                const new_expr = try self.allocator().create(Expression);
                 new_expr.* = .{
                     .binary_op = .{
                         expr,
@@ -207,7 +222,7 @@ pub const Parser = struct {
 
                 const un = try self.unary();
 
-                const new_expr = try self.allocator.create(Expression);
+                const new_expr = try self.allocator().create(Expression);
                 new_expr.* = .{
                     .unary_op = .{ un, op },
                 };
@@ -221,7 +236,7 @@ pub const Parser = struct {
     fn primary(self: *Parser) ParserError!*Expression {
         const prim = val: switch (self.peek()) {
             .number => |n| {
-                const num = try self.allocator.create(Expression);
+                const num = try self.allocator().create(Expression);
                 num.* = .{ .literal = .{ .number = n } };
 
                 break :val num;

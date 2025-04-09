@@ -68,11 +68,8 @@ pub fn main() !void {
     var statements = ArrayList(*Expression).init(allocator);
     defer statements.deinit();
 
-    var arena = std.heap.ArenaAllocator.init(allocator);
-    defer arena.deinit();
-    const arena_alloc = arena.allocator();
-
-    var parser = Parser{ .stream = stream_buf.items, .allocator = arena_alloc };
+    var parser = Parser.init(stream_buf.items, allocator);
+    defer parser.deinit();
 
     parser.parse(&statements) catch |err| switch (err) {
         else => {
@@ -81,7 +78,7 @@ pub fn main() !void {
         },
     };
 
-    for (statements.items) |statement| {
-        std.debug.print("{}\n", .{statement});
+    for (statements.items) |ast| {
+        std.debug.print("{};\n", .{ast});
     }
 }

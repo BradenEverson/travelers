@@ -1,14 +1,86 @@
+const std = @import("std");
+
 pub const Expression = union(enum) {
     literal: Literal,
     binary_op: struct { *const Expression, BinaryOp, *const Expression },
     unary_op: struct { *const Expression, UnaryOp },
+
+    pub fn format(
+        self: *const Expression,
+        _: []const u8,
+        _: std.fmt.FormatOptions,
+        writer: anytype,
+    ) !void {
+        switch (self.*) {
+            .literal => |lit| {
+                try writer.print("{}", .{lit});
+            },
+
+            .binary_op => |bin| {
+                try writer.print("{} {} {}", .{ bin.@"0", bin.@"1", bin.@"2" });
+            },
+            else => try writer.print("not done yet", .{}),
+        }
+    }
 };
 
 pub const Literal = union(enum) {
     number: f32,
     string: []const u8,
     boolean: bool,
+
+    pub fn format(
+        self: *const Literal,
+        _: []const u8,
+        _: std.fmt.FormatOptions,
+        writer: anytype,
+    ) !void {
+        switch (self.*) {
+            .number => |n| {
+                try writer.print("{d}", .{n});
+            },
+
+            .string => |s| {
+                try writer.print("{s}", .{s});
+            },
+
+            .boolean => |b| {
+                try writer.print("{}", .{b});
+            },
+        }
+    }
 };
 
-pub const BinaryOp = enum { add, sub, mul, div, equal, not_equal, gt, gte, lt, lte };
+pub const BinaryOp = enum {
+    add,
+    sub,
+    mul,
+    div,
+    equal,
+    not_equal,
+    gt,
+    gte,
+    lt,
+    lte,
+
+    pub fn format(
+        self: *const BinaryOp,
+        _: []const u8,
+        _: std.fmt.FormatOptions,
+        writer: anytype,
+    ) !void {
+        switch (self.*) {
+            .add => try writer.print("+", .{}),
+            .sub => try writer.print("-", .{}),
+            .mul => try writer.print("*", .{}),
+            .div => try writer.print("/", .{}),
+            .equal => try writer.print("==", .{}),
+            .not_equal => try writer.print("!=", .{}),
+            .gt => try writer.print(">", .{}),
+            .gte => try writer.print(">=", .{}),
+            .lt => try writer.print("<", .{}),
+            .lte => try writer.print("<=", .{}),
+        }
+    }
+};
 pub const UnaryOp = enum { not, neg };
