@@ -12,15 +12,25 @@ pub const ParseError = error{ExpectedTokenFound};
 
 pub const ParserError = ParseError || std.mem.Allocator.Error;
 
+pub const ParserErrorContext = struct {
+    wanted_token: []const u8,
+    line: usize,
+    col: usize,
+    len: usize,
+};
+
 pub const Parser = struct {
     stream: []const Token,
     index: usize = 0,
     arena: std.heap.ArenaAllocator,
 
+    err_ctx: ParserErrorContext,
+
     pub fn init(stream: []const Token, child_allocator: std.mem.Allocator) Parser {
         return Parser{
             .stream = stream,
             .arena = std.heap.ArenaAllocator.init(child_allocator),
+            .err_ctx = undefined,
         };
     }
 

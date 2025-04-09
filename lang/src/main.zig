@@ -6,7 +6,7 @@ const Expression = @import("./parser/expression.zig").Expression;
 const ArrayList = std.ArrayList;
 
 pub fn main() !void {
-    //const allocator = std.heap.page_allocator;
+    // const allocator = std.heap.page_allocator;
 
     var gpa = std.heap.GeneralPurposeAllocator(.{}).init;
     const allocator = gpa.allocator();
