@@ -1,6 +1,11 @@
 const std = @import("std");
 
 pub const Expression = union(enum) {
+    move_left: ?*const Expression,
+    move_right: ?*const Expression,
+    move_up: ?*const Expression,
+    move_down: ?*const Expression,
+
     literal: Literal,
     binary_op: struct { *const Expression, BinaryOp, *const Expression },
     unary_op: struct { *const Expression, UnaryOp },

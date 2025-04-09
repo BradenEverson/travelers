@@ -66,13 +66,16 @@ pub const Parser = struct {
 
     fn statement(self: *Parser) ParserError!*Expression {
         const tag = self.peek();
-        return switch (tag) {
-            else => expr: {
-                const e = try self.expression();
-                try self.consume(.semicolon);
-                break :expr e;
+        switch (tag) {
+            .keyword => |key| switch (key) {
+                .up, .down, .left, .right => @panic("Move action"),
             },
-        };
+            else => {},
+        }
+
+        const e = try self.expression();
+        try self.consume(.semicolon);
+        return e;
     }
 
     fn expression(self: *Parser) ParserError!*Expression {
