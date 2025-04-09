@@ -26,7 +26,6 @@ pub const Expression = union(enum) {
 
 pub const Literal = union(enum) {
     number: f32,
-    string: []const u8,
     boolean: bool,
 
     pub fn format(
@@ -38,10 +37,6 @@ pub const Literal = union(enum) {
         switch (self.*) {
             .number => |n| {
                 try writer.print("{d}", .{n});
-            },
-
-            .string => |s| {
-                try writer.print("{s}", .{s});
             },
 
             .boolean => |b| {
