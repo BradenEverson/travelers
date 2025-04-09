@@ -32,7 +32,7 @@ pub const Expression = union(enum) {
             },
 
             .unary_op => |un| {
-                try writer.print("{} {}", .{ un.@"1", un.@"0" });
+                try writer.print("{}{}", .{ un.@"1", un.@"0" });
             },
 
             .move_left => |e| {
@@ -42,6 +42,7 @@ pub const Expression = union(enum) {
                     try writer.print("left", .{});
                 }
             },
+
             .move_right => |e| {
                 if (e) |ex| {
                     try writer.print("right {}", .{ex});
