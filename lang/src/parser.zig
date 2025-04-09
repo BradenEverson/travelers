@@ -68,7 +68,7 @@ pub const Parser = struct {
     }
 
     pub fn parse(self: *Parser, statements: *std.ArrayList(*Expression)) ParserError!void {
-        while (!self.at_end()) : (self.advance()) {
+        while (!self.at_end()) {
             const s = try self.statement();
             try statements.append(s);
         }
@@ -77,18 +77,27 @@ pub const Parser = struct {
     fn statement(self: *Parser) ParserError!*Expression {
         const tag = self.peek();
         switch (tag) {
-            .keyword => |key| switch (key) {
-                .left => @panic("impl left"),
-                .right => @panic("impl right"),
-                .up => @panic("impl up"),
-                .down => @panic("impl down"),
-            },
-            else => {},
-        }
+            .keyword => |key| {
+                const new_expr = try self.allocator().create(Expression);
+                switch (key) {
+                    // TODO: Handle a primary value being next to the expression
+                    .left => new_expr.* = .{ .move_left = null },
+                    .right => new_expr.* = .{ .move_right = null },
+                    .up => new_expr.* = .{ .move_up = null },
+                    .down => new_expr.* = .{ .move_down = null },
+                }
 
-        const e = try self.expression();
-        try self.consume(.semicolon);
-        return e;
+                self.advance();
+                try self.consume(.semicolon);
+
+                return new_expr;
+            },
+            else => {
+                const e = try self.expression();
+                try self.consume(.semicolon);
+                return e;
+            },
+        }
     }
 
     fn expression(self: *Parser) ParserError!*Expression {
@@ -269,7 +278,9 @@ pub const Parser = struct {
 
                 break :val grouping;
             },
-            else => error.ExpectedTokenFound,
+            else => {
+                return error.ExpectedTokenFound;
+            },
         };
 
         return prim;
