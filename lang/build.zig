@@ -46,7 +46,7 @@ pub fn build(b: *std.Build) void {
 
     b.installArtifact(wasm_exe);
 
-    const wasm_cmd = b.addInstallArtifact(wasm_exe, .{});
+    const wasm_cmd = b.addInstallArtifact(wasm_exe, .{ .dest_dir = .{ .override = .{ .custom = "../../game/wasm/" } } });
     wasm_cmd.step.dependOn(b.getInstallStep());
 
     const wasm_step = b.step("wasm", "Build for wasm");
