@@ -1,6 +1,5 @@
 var memory = new WebAssembly.Memory({
     initial: 2,
-    maximum: 2,
 });
 
 var x;

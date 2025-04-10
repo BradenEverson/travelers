@@ -5,9 +5,7 @@ const std = @import("std");
 pub extern "env" fn updatePosition(x: u32, y: u32) void;
 pub extern "env" fn moveRelative(dx: i32, dy: i32) void;
 
-var global_buf: [2048]u8 = undefined;
-var fba = std.heap.FixedBufferAllocator.init(&global_buf);
-const allocator = fba.allocator();
+const allocator = std.heap.wasm_allocator;
 
 export fn moveRoutine() i32 {
     moveRountineInner() catch {
@@ -17,15 +15,22 @@ export fn moveRoutine() i32 {
 }
 
 fn moveRountineInner() !void {
-    var moves = std.ArrayList(u32).init(allocator);
+    const Move = struct {
+        dx: i32,
+        dy: i32,
+    };
+
+    var moves = std.ArrayList(Move).init(allocator);
     defer moves.deinit();
 
-    try moves.append(1);
-    try moves.append(2);
-    try moves.append(1);
-    try moves.append(3);
+    try moves.append(.{ .dy = 1, .dx = -1 });
+    try moves.append(.{ .dy = 5, .dx = 6 });
+    try moves.append(.{ .dy = -10, .dx = 0 });
+    try moves.append(.{ .dy = 1, .dx = -1 });
+
+    updatePosition(16, 16);
 
     for (moves.items) |move| {
-        updatePosition(move, move);
+        moveRelative(move.dx, move.dy);
     }
 }
