@@ -1,13 +1,31 @@
 //! Main wasm runtime
 
+const std = @import("std");
+
 pub extern "env" fn updatePosition(x: u32, y: u32) void;
 pub extern "env" fn moveRelative(dx: i32, dy: i32) void;
 
-export fn moveRoutine() void {
-    updatePosition(16, 16);
+var global_buf: [2048]u8 = undefined;
+var fba = std.heap.FixedBufferAllocator.init(&global_buf);
+const allocator = fba.allocator();
 
-    moveRelative(5, 0);
-    moveRelative(-5, 0);
-    moveRelative(0, 10);
-    moveRelative(3, -2);
+export fn moveRoutine() i32 {
+    moveRountineInner() catch {
+        return -1;
+    };
+    return 0;
+}
+
+fn moveRountineInner() !void {
+    var moves = std.ArrayList(u32).init(allocator);
+    defer moves.deinit();
+
+    try moves.append(1);
+    try moves.append(2);
+    try moves.append(1);
+    try moves.append(3);
+
+    for (moves.items) |move| {
+        updatePosition(move, move);
+    }
 }
