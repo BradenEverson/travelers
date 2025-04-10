@@ -1,6 +1,8 @@
 // build.zig
 const std = @import("std");
 
+const number_of_pages = 2;
+
 pub fn build(b: *std.Build) void {
     const exe = b.addExecutable(.{
         .name = "traveler",
@@ -21,6 +23,32 @@ pub fn build(b: *std.Build) void {
 
     run_step.dependOn(&run_cmd.step);
 
+    const target = b.resolveTargetQuery(.{
+        .cpu_arch = .wasm32,
+        .os_tag = .freestanding,
+    });
+
+    var wasm_exe = b.addExecutable(.{
+        .name = "traveler_wasm",
+        .root_source_file = b.path("src/wasm.zig"),
+        .target = target,
+        .optimize = .ReleaseSmall,
+    });
+
+    wasm_exe.global_base = 6560;
+    wasm_exe.entry = .disabled;
+    wasm_exe.rdynamic = true;
+    wasm_exe.import_memory = true;
+    wasm_exe.stack_size = std.wasm.page_size;
+
+    wasm_exe.initial_memory = std.wasm.page_size * number_of_pages;
+    wasm_exe.max_memory = std.wasm.page_size * number_of_pages;
+
+    b.installArtifact(wasm_exe);
+
+    const wasm_cmd = b.addInstallArtifact(wasm_exe, .{});
+    wasm_cmd.step.dependOn(b.getInstallStep());
+
     const wasm_step = b.step("wasm", "Build for wasm");
-    _ = wasm_step;
+    wasm_step.dependOn(&wasm_cmd.step);
 }
