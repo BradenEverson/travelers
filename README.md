@@ -1,2 +1,2 @@
 # Travelers
-preprogrammed robot battle royale
+robot battle royale
