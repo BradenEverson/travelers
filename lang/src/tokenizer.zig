@@ -114,7 +114,7 @@ pub const TokenTag = union(enum) {
 
 pub const TokenizeError = TokenError || std.mem.Allocator.Error;
 
-pub fn tokenize(stream: []const u8, buf: *ArrayList(Token), err_ctx: *ErrorContext) TokenizeError!void {
+pub fn tokenize(stream: []const u8, buf: *ArrayList(Token), err_ctx: ?*ErrorContext) TokenizeError!void {
     var peek = PeekableIterator(u8){ .buf = stream };
 
     var line: u32 = 1;
@@ -237,11 +237,13 @@ pub fn tokenize(stream: []const u8, buf: *ArrayList(Token), err_ctx: *ErrorConte
                         _ = peek.next();
                     }
 
-                    err_ctx.*.col = col;
-                    err_ctx.*.token = tok;
-                    err_ctx.*.line = line;
-                    err_ctx.*.len = len;
-                    err_ctx.*.target_line = .{ line_start, error_end };
+                    if (err_ctx) |ctx| {
+                        ctx.*.col = col;
+                        ctx.*.token = tok;
+                        ctx.*.line = line;
+                        ctx.*.len = len;
+                        ctx.*.target_line = .{ line_start, error_end };
+                    }
                     return error.UnreckognizedToken;
                 }
             },

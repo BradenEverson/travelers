@@ -72,5 +72,8 @@ let importObject = {
 
 WebAssembly.instantiateStreaming(fetch("wasm/traveler_wasm.wasm"), importObject).then((result) => {
     const wasmMemoryArray = new Uint8Array(memory.buffer);
-    result.instance.exports.moveRoutine();
+
+    setInterval(() => {
+        result.instance.exports.step();
+    }, 100);
 });

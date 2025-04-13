@@ -20,18 +20,22 @@ pub const ParserErrorContext = struct {
 };
 
 pub const Parser = struct {
-    stream: []const Token,
+    stream: ?[]const Token,
     index: usize = 0,
     arena: std.heap.ArenaAllocator,
 
     err_ctx: ParserErrorContext,
 
-    pub fn init(stream: []const Token, child_allocator: std.mem.Allocator) Parser {
+    pub fn init(stream: ?[]const Token, child_allocator: std.mem.Allocator) Parser {
         return Parser{
             .stream = stream,
             .arena = std.heap.ArenaAllocator.init(child_allocator),
             .err_ctx = undefined,
         };
+    }
+
+    pub fn set_tokens(self: *Parser, tokens: []const Token) void {
+        self.stream = tokens;
     }
 
     fn allocator(self: *Parser) std.mem.Allocator {
@@ -42,20 +46,20 @@ pub const Parser = struct {
         self.arena.deinit();
     }
 
-    fn peek(self: *Parser) TokenTag {
-        return self.stream[self.index].tag;
+    fn peek(self: *Parser) ?TokenTag {
+        return self.stream.?[self.index].tag;
     }
 
     fn advance(self: *Parser) void {
-        if (self.index >= self.stream.len - 1) {
-            self.index = self.stream.len - 1;
+        if (self.index >= self.stream.?.len - 1) {
+            self.index = self.stream.?.len - 1;
         } else {
             self.index += 1;
         }
     }
 
     fn consume(self: *Parser, tok: TokenTag) ParserError!void {
-        if (std.meta.eql(self.peek(), tok)) {
+        if (std.meta.eql(self.peek().?, tok)) {
             self.advance();
             return;
         } else {
@@ -64,7 +68,7 @@ pub const Parser = struct {
     }
 
     fn at_end(self: *Parser) bool {
-        return self.peek() == .eof;
+        return self.peek().? == .eof;
     }
 
     pub fn parse(self: *Parser, statements: *std.ArrayList(*Expression)) ParserError!void {
@@ -75,7 +79,7 @@ pub const Parser = struct {
     }
 
     fn statement(self: *Parser) ParserError!*Expression {
-        const tag = self.peek();
+        const tag = self.peek().?;
         switch (tag) {
             .keyword => |key| {
                 const new_expr = try self.allocator().create(Expression);
@@ -101,7 +105,7 @@ pub const Parser = struct {
     }
 
     fn expression(self: *Parser) ParserError!*Expression {
-        return switch (self.peek()) {
+        return switch (self.peek().?) {
             else => try self.equality(),
         };
     }
@@ -109,9 +113,9 @@ pub const Parser = struct {
     fn equality(self: *Parser) ParserError!*Expression {
         var expr = try self.comparison();
 
-        grow: switch (self.peek()) {
+        grow: switch (self.peek().?) {
             .equalequal, .bangequal => {
-                const op: BinaryOp = switch (self.peek()) {
+                const op: BinaryOp = switch (self.peek().?) {
                     .equalequal => .equal,
                     .bangequal => .not_equal,
                     else => unreachable,
@@ -129,7 +133,7 @@ pub const Parser = struct {
                     },
                 };
                 expr = new_expr;
-                continue :grow self.peek();
+                continue :grow self.peek().?;
             },
             else => {},
         }
@@ -140,9 +144,9 @@ pub const Parser = struct {
     fn comparison(self: *Parser) ParserError!*Expression {
         var expr = try self.term();
 
-        grow: switch (self.peek()) {
+        grow: switch (self.peek().?) {
             .gt, .gte, .lt, .lte => {
-                const op: BinaryOp = switch (self.peek()) {
+                const op: BinaryOp = switch (self.peek().?) {
                     .gt => .gt,
                     .lt => .lt,
                     .gte => .gte,
@@ -163,7 +167,7 @@ pub const Parser = struct {
                     },
                 };
                 expr = new_expr;
-                continue :grow self.peek();
+                continue :grow self.peek().?;
             },
             else => {},
         }
@@ -174,9 +178,9 @@ pub const Parser = struct {
     fn term(self: *Parser) ParserError!*Expression {
         var expr = try self.factor();
 
-        grow: switch (self.peek()) {
+        grow: switch (self.peek().?) {
             .plus, .minus => {
-                const op: BinaryOp = switch (self.peek()) {
+                const op: BinaryOp = switch (self.peek().?) {
                     .plus => .add,
                     .minus => .sub,
 
@@ -195,7 +199,7 @@ pub const Parser = struct {
                     },
                 };
                 expr = new_expr;
-                continue :grow self.peek();
+                continue :grow self.peek().?;
             },
             else => {},
         }
@@ -206,9 +210,9 @@ pub const Parser = struct {
     fn factor(self: *Parser) ParserError!*Expression {
         var expr = try self.unary();
 
-        grow: switch (self.peek()) {
+        grow: switch (self.peek().?) {
             .star, .slash => {
-                const op: BinaryOp = switch (self.peek()) {
+                const op: BinaryOp = switch (self.peek().?) {
                     .star => .mul,
                     .slash => .div,
 
@@ -227,7 +231,7 @@ pub const Parser = struct {
                     },
                 };
                 expr = new_expr;
-                continue :grow self.peek();
+                continue :grow self.peek().?;
             },
             else => {},
         }
@@ -236,9 +240,9 @@ pub const Parser = struct {
     }
 
     fn unary(self: *Parser) ParserError!*Expression {
-        switch (self.peek()) {
+        switch (self.peek().?) {
             .bang, .minus => {
-                const op: UnaryOp = switch (self.peek()) {
+                const op: UnaryOp = switch (self.peek().?) {
                     .bang => .not,
                     .minus => .neg,
                     else => unreachable,
@@ -259,7 +263,7 @@ pub const Parser = struct {
     }
 
     fn primary(self: *Parser) ParserError!*Expression {
-        const prim = val: switch (self.peek()) {
+        const prim = val: switch (self.peek().?) {
             .number => |n| {
                 self.advance();
                 const num = try self.allocator().create(Expression);
