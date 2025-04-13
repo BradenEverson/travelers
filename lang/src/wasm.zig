@@ -41,8 +41,11 @@ export fn step() i32 {
 
 /// Internal step function that can return an error, masked by the exported step function
 fn stepInner() !void {
-    if (pc >= instructions.items.len) {
+    if (pc >= 32) {
         return;
     }
+
+    moveRelative(1, 1);
+
     pc += 1;
 }
