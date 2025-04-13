@@ -2,6 +2,12 @@ const Expression = @import("./parser/expression.zig").Expression;
 const std = @import("std");
 const Literal = @import("./parser/expression.zig").Literal;
 
+pub const RuntimeError = error{
+    WrongLiteralType,
+};
+
+pub const EvaluatorError = RuntimeError;
+
 pub const Evaluator = struct {
     allocator: std.mem.Allocator,
     scope: std.AutoHashMap([]const u8, Literal),
@@ -13,7 +19,7 @@ pub const Evaluator = struct {
         };
     }
 
-    pub fn eval(self: *Evaluator, ast: Expression) void {
+    pub fn eval(self: *Evaluator, ast: Expression) EvaluatorError!void {
         _ = self;
         _ = ast;
     }
