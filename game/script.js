@@ -68,6 +68,13 @@ let importObject = {
             y += dy;
             drawGrid();
         },
+
+        log: (ptr, len) => {
+            const buffer = new Uint8Array(memory.buffer, ptr, len);
+            const str = new TextDecoder().decode(buffer);
+            console.log(str);
+        },
+
         memory: memory,
     },
 };
@@ -79,11 +86,14 @@ WebAssembly.instantiateStreaming(fetch("wasm/traveler_wasm.wasm"), importObject)
         const encoder = new TextEncoder();
         const encoded = encoder.encode(str);
         const ptr = result.instance.exports.alloc(encoded.length);
-        const mem = new Uint8Array(module.memory.buffer);
+        const mem = new Uint8Array(memory.buffer);
         mem.set(encoded, ptr);
 
-        return [ptr, encoded.len];
+        return [ptr, encoded.length];
     }
+
+    let test = stringToPtr("right;");
+    console.log(result.instance.exports.loadProgram(test[0], test[1]));
 
     setInterval(() => {
         result.instance.exports.step();
