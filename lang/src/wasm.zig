@@ -14,6 +14,11 @@ var pc: usize = 0;
 var instructions = std.ArrayList(*Expression).init(allocator);
 var parser = Parser.init(null, allocator);
 
+export fn alloc(len: u32) [*]const u8 {
+    const slice = allocator.alloc(u8, len) catch @panic("Allocating went wrong");
+    return slice.ptr;
+}
+
 export fn loadProgram(prog: [*]u8, len: usize) i32 {
     loadProgramInner(prog, len) catch {
         return -1;
@@ -42,10 +47,11 @@ export fn step() i32 {
 /// Internal step function that can return an error, masked by the exported step function
 fn stepInner() !void {
     if (pc >= 32) {
-        return;
+        pc = 0;
+        // return;
     }
 
-    moveRelative(1, 1);
+    updatePosition(pc, pc);
 
     pc += 1;
 }

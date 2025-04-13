@@ -54,6 +54,8 @@ function handleResize() {
 handleResize();
 window.addEventListener('resize', handleResize);
 
+
+
 let importObject = {
     env: {
         updatePosition: (new_x, new_y) => {
@@ -72,6 +74,16 @@ let importObject = {
 
 WebAssembly.instantiateStreaming(fetch("wasm/traveler_wasm.wasm"), importObject).then((result) => {
     const wasmMemoryArray = new Uint8Array(memory.buffer);
+
+    function stringToPtr(str) {
+        const encoder = new TextEncoder();
+        const encoded = encoder.encode(str);
+        const ptr = result.instance.exports.alloc(encoded.length);
+        const mem = new Uint8Array(module.memory.buffer);
+        mem.set(encoded, ptr);
+
+        return [ptr, encoded.len];
+    }
 
     setInterval(() => {
         result.instance.exports.step();
