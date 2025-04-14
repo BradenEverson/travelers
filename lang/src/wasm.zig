@@ -23,13 +23,14 @@ const Move = struct {
     dir: Direction,
 };
 
-var move_queue = std.DoublyLinkedList(Move){};
+const MoveQueue = std.DoublyLinkedList(Move);
+var move_queue = MoveQueue{};
 
 fn enqueue_move(dir: Direction, amount: usize) void {
     for (0..amount) |_| {
         const mv = Move{ .dir = dir };
 
-        const node = allocator.create(std.DoublyLinkedList(Move).Node) catch @panic("Allocation problems");
+        const node = allocator.create(MoveQueue.Node) catch @panic("Allocation problems");
         node.*.data = mv;
 
         move_queue.append(node);
