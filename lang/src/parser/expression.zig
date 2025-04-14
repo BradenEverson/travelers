@@ -1,4 +1,5 @@
 const std = @import("std");
+const RuntimeError = @import("../evaluator.zig").RuntimeError;
 const Keyword = @import("../tokenizer.zig").Keyword;
 
 pub const Direction = enum {
@@ -65,6 +66,21 @@ pub const Literal = union(enum) {
     number: f32,
     boolean: bool,
     void,
+
+    pub fn truthy(self: *const Literal) RuntimeError!bool {
+        return switch (self.*) {
+            .number => |n| n != 0,
+            .boolean => |b| b,
+            else => error.WrongLiteralType,
+        };
+    }
+
+    pub fn numeric(self: *const Literal) RuntimeError!f32 {
+        return switch (self.*) {
+            .number => |n| n,
+            else => error.WrongLiteralType,
+        };
+    }
 
     pub fn format(
         self: *const Literal,

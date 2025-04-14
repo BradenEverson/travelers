@@ -30,9 +30,15 @@ pub const Evaluator = struct {
     pub fn eval(self: *Evaluator, ast: *const Expression) EvaluatorError!Literal {
         switch (ast.*) {
             .move => |moveinfo| {
-                self.vtable.move_fn(moveinfo.@"0", 1);
+                const mag = if (moveinfo.@"1") |magnitude|
+                    try (try self.eval(magnitude)).numeric()
+                else
+                    1.0;
+                self.vtable.move_fn(moveinfo.@"0", @intFromFloat(mag));
                 return .void;
             },
+
+            .literal => |literal| return literal,
 
             else => @panic("Unimplemented expression"),
         }
