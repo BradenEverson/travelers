@@ -10,7 +10,7 @@ pub const RuntimeError = error{
 pub const EvaluatorError = RuntimeError;
 
 pub const EvaluatorVtable = struct {
-    move_fn: *const fn (Direction, i32) void,
+    move_fn: *const fn (Direction, usize) void,
     print_fn: ?*const fn (Literal) void,
 };
 

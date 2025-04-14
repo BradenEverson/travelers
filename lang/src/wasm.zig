@@ -15,15 +15,34 @@ const allocator = std.heap.wasm_allocator;
 
 var pc: usize = 0;
 var instructions = std.ArrayList(*Expression).init(allocator);
-var parser = Parser.init(null, allocator);
-var runtime = Evaluator.init(allocator, .{ .move_fn = move, .print_fn = null });
 
-fn move(dir: Direction, amount: i32) void {
+var parser = Parser.init(null, allocator);
+var runtime = Evaluator.init(allocator, .{ .move_fn = enqueue_move, .print_fn = null });
+
+const Move = struct {
+    dir: Direction,
+};
+
+var move_queue = std.DoublyLinkedList(Move){};
+
+fn enqueue_move(dir: Direction, amount: usize) void {
+    for (0..amount) |_| {
+        const mv = Move{ .dir = dir };
+
+        const node = allocator.create(std.DoublyLinkedList(Move).Node) catch @panic("Allocation problems");
+        node.*.data = mv;
+
+        move_queue.append(node);
+    }
+}
+
+fn move(dir: Direction, amount: usize) void {
+    const amnt: i32 = @intCast(amount);
     switch (dir) {
-        .left => moveRelative(-amount, 0),
-        .right => moveRelative(amount, 0),
-        .up => moveRelative(0, -amount),
-        .down => moveRelative(0, amount),
+        .left => moveRelative(-amnt, 0),
+        .right => moveRelative(amnt, 0),
+        .up => moveRelative(0, -amnt),
+        .down => moveRelative(0, amnt),
     }
 }
 
@@ -72,11 +91,13 @@ export fn step() i32 {
 
 /// Internal step function that can return an error, masked by the exported step function
 fn stepInner() !void {
-    if (pc >= instructions.items.len) {
-        return;
+    if (pc < instructions.items.len and move_queue.len == 0) {
+        _ = try runtime.eval(instructions.items[pc]);
+
+        pc += 1;
     }
 
-    _ = try runtime.eval(instructions.items[pc]);
-
-    pc += 1;
+    if (move_queue.popFirst()) |mv| {
+        move(mv.*.data.dir, 1);
+    }
 }

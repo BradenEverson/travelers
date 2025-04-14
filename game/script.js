@@ -92,10 +92,10 @@ WebAssembly.instantiateStreaming(fetch("wasm/traveler_wasm.wasm"), importObject)
         return [ptr, encoded.length];
     }
 
-    let test = stringToPtr("move right 10;");
+    let test = stringToPtr("move down 10; move right 10; move up 10; move left 10;");
     console.log(result.instance.exports.loadProgram(test[0], test[1]));
 
     setInterval(() => {
         result.instance.exports.step();
-    }, 250);
+    }, 100);
 });
