@@ -68,10 +68,12 @@ export fn loadProgram(prog: [*]u8, len: usize) i32 {
 fn loadProgramInner(prog: [*]u8, len: usize) !void {
     instructions.clearAndFree();
     while (move_queue.pop()) |_| {}
+
+    parser.deinit();
+    parser = Parser.init(null, allocator);
     pc = 0;
 
     var stream_buf = std.ArrayList(tokenizer.Token).init(allocator);
-    defer stream_buf.deinit();
 
     const stream = prog[0..len];
     const string = try std.fmt.allocPrint(allocator, "'{s}'\n", .{stream});
