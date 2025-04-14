@@ -66,6 +66,10 @@ export fn loadProgram(prog: [*]u8, len: usize) i32 {
 }
 
 fn loadProgramInner(prog: [*]u8, len: usize) !void {
+    instructions.clearAndFree();
+    while (move_queue.pop()) |_| {}
+    pc = 0;
+
     var stream_buf = std.ArrayList(tokenizer.Token).init(allocator);
     defer stream_buf.deinit();
 
@@ -78,7 +82,6 @@ fn loadProgramInner(prog: [*]u8, len: usize) !void {
     parser.set_tokens(stream_buf.items);
 
     try parser.parse(&instructions);
-    pc = 0;
 }
 
 /// Steps the runtime by one frame, performs a single statement and updates position as such

@@ -16,7 +16,7 @@ async function drawGrid() {
     const cellWidth = canvas.width / grid.x;
     const cellHeight = canvas.height / grid.y;
     
-    ctx.strokeStyle = '#000000';
+    ctx.strokeStyle = "#000000";
     ctx.lineWidth = 1;
     ctx.beginPath();
     
@@ -37,10 +37,10 @@ async function drawGrid() {
         const highlightX = x * cellWidth;
         const highlightY = y * cellHeight;
         
-        ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
+        ctx.fillStyle = "rgba(255, 0, 0, 0.5)";
         ctx.fillRect(highlightX, highlightY, cellWidth, cellHeight);
         
-        ctx.strokeStyle = '#000000';
+        ctx.strokeStyle = "#000000";
         ctx.strokeRect(highlightX, highlightY, cellWidth, cellHeight);
     }
 }
@@ -52,7 +52,7 @@ function handleResize() {
 }
 
 handleResize();
-window.addEventListener('resize', handleResize);
+window.addEventListener("resize", handleResize);
 
 
 
@@ -92,8 +92,18 @@ WebAssembly.instantiateStreaming(fetch("wasm/traveler_wasm.wasm"), importObject)
         return [ptr, encoded.length];
     }
 
-    let test = stringToPtr("move down 10; move right 10; move up 10; move left 10;");
-    console.log(result.instance.exports.loadProgram(test[0], test[1]));
+    
+    document.getElementById("run").addEventListener("click", () => {
+        if (!result.instance) {
+            console.error("WASM not loaded yet");
+            return;
+        }
+
+        const code = document.getElementById("code").value;
+        console.log(code);
+        const [ptr, len] = stringToPtr(code);
+        console.log(result.instance.exports.loadProgram(ptr, len));
+    });
 
     setInterval(() => {
         result.instance.exports.step();
