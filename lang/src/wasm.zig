@@ -2,11 +2,14 @@
 
 const console = @import("./wasm/core.zig");
 const std = @import("std");
-const Expression = @import("./parser/expression.zig").Expression;
 const tokenizer = @import("./tokenizer.zig");
 const Parser = @import("./parser.zig").Parser;
+
+const expression = @import("./parser/expression.zig");
+const Expression = expression.Expression;
+const Direction = expression.Direction;
+
 const Evaluator = @import("./evaluator.zig").Evaluator;
-const Direction = @import("./parser/expression.zig").Direction;
 
 pub extern "env" fn updatePosition(x: u32, y: u32) void;
 pub extern "env" fn moveRelative(dx: i32, dy: i32) void;
