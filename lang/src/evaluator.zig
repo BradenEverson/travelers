@@ -40,6 +40,13 @@ pub const Evaluator = struct {
 
             .literal => |literal| return literal,
 
+            .binary_op => |bin| {
+                const left = try self.eval(bin.@"0");
+                const right = try self.eval(bin.@"2");
+
+                return bin.@"1".eval(left, right);
+            },
+
             else => @panic("Unimplemented expression"),
         }
     }

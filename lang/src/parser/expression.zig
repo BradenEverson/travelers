@@ -116,6 +116,18 @@ pub const BinaryOp = enum {
     lt,
     lte,
 
+    pub fn eval(self: *const BinaryOp, left: Literal, right: Literal) RuntimeError!Literal {
+        return switch (self.*) {
+            .add => {
+                const l = try left.numeric();
+                const r = try right.numeric();
+
+                return .{ .number = l + r };
+            },
+            else => @panic("unimplemented binary op"),
+        };
+    }
+
     pub fn format(
         self: *const BinaryOp,
         _: []const u8,
