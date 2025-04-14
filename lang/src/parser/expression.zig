@@ -124,6 +124,28 @@ pub const BinaryOp = enum {
 
                 return .{ .number = l + r };
             },
+
+            .sub => {
+                const l = try left.numeric();
+                const r = try right.numeric();
+
+                return .{ .number = l - r };
+            },
+
+            .mul => {
+                const l = try left.numeric();
+                const r = try right.numeric();
+
+                return .{ .number = l * r };
+            },
+
+            .div => {
+                const l = try left.numeric();
+                const r = try right.numeric();
+
+                return .{ .number = l / r };
+            },
+
             else => @panic("unimplemented binary op"),
         };
     }
