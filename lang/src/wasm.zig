@@ -5,7 +5,7 @@ const Expression = @import("./parser/expression.zig").Expression;
 const tokenizer = @import("./tokenizer.zig");
 const Parser = @import("./parser.zig").Parser;
 const Evaluator = @import("./evaluator.zig").Evaluator;
-const Direction = @import("./evaluator.zig").Direction;
+const Direction = @import("./parser/expression.zig").Direction;
 
 pub extern "env" fn updatePosition(x: u32, y: u32) void;
 pub extern "env" fn moveRelative(dx: i32, dy: i32) void;
@@ -40,6 +40,7 @@ export fn loadProgram(prog: [*]u8, len: usize) i32 {
     loadProgramInner(prog, len) catch |err| switch (err) {
         error.UnreckognizedToken => return -2,
         error.ExpectedTokenFound => return -3,
+        error.UnexpectedKeyword => return -4,
         else => return -1,
     };
     return 0;

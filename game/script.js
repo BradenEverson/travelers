@@ -92,7 +92,7 @@ WebAssembly.instantiateStreaming(fetch("wasm/traveler_wasm.wasm"), importObject)
         return [ptr, encoded.length];
     }
 
-    let test = stringToPtr("right;");
+    let test = stringToPtr("move right;move right;move right;move down;move down;move down;move down;move down;move down;move down;move down;move down;move down;move down;move down;move down;move down;move down;move down;move down;move down;move down;move down;");
     console.log(result.instance.exports.loadProgram(test[0], test[1]));
 
     setInterval(() => {

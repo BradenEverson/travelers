@@ -35,12 +35,14 @@ pub const Keyword = enum {
     right,
     up,
     down,
+    move,
 
     const mappings = std.StaticStringMap(Keyword).initComptime(.{
         .{ "left", .left },
         .{ "right", .right },
         .{ "up", .up },
         .{ "down", .down },
+        .{ "move", .move },
     });
 
     pub fn format(self: *const Keyword, _: []const u8, _: std.fmt.FormatOptions, writer: anytype) !void {
@@ -49,6 +51,7 @@ pub const Keyword = enum {
             .right => try writer.print("right", .{}),
             .up => try writer.print("up", .{}),
             .down => try writer.print("down", .{}),
+            .move => try writer.print("move", .{}),
         }
     }
 

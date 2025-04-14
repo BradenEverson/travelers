@@ -1,6 +1,7 @@
 const std = @import("std");
 const tokenizer = @import("./tokenizer.zig");
 const expression = @import("./parser/expression.zig");
+const direction_from_keyword = @import("./parser/expression.zig").direction_from_keyword;
 const Expression = expression.Expression;
 const BinaryOp = expression.BinaryOp;
 const UnaryOp = expression.UnaryOp;
@@ -8,7 +9,7 @@ const UnaryOp = expression.UnaryOp;
 const Token = tokenizer.Token;
 const TokenTag = tokenizer.TokenTag;
 
-pub const ParseError = error{ExpectedTokenFound};
+pub const ParseError = error{ ExpectedTokenFound, UnexpectedKeyword };
 
 pub const ParserError = ParseError || std.mem.Allocator.Error;
 
@@ -78,21 +79,39 @@ pub const Parser = struct {
         }
     }
 
+    fn move_statement(self: *Parser, expr: *Expression) ParserError!void {
+        self.advance();
+        const tag = self.peek().?;
+        switch (tag) {
+            .keyword => |key| {
+                switch (key) {
+                    .up, .down, .left, .right => {
+                        self.advance();
+                        const dir = direction_from_keyword(key) orelse unreachable;
+                        expr.* = .{ .move = .{ dir, null } };
+                    },
+                    else => return error.UnexpectedKeyword,
+                }
+            },
+            else => return error.ExpectedTokenFound,
+        }
+
+        if (!std.meta.eql(self.peek().?, .semicolon)) {
+            const eval = try self.expression();
+            expr.*.move.@"1" = eval;
+        }
+        return self.consume(.semicolon);
+    }
+
     fn statement(self: *Parser) ParserError!*Expression {
         const tag = self.peek().?;
         switch (tag) {
             .keyword => |key| {
                 const new_expr = try self.allocator().create(Expression);
                 switch (key) {
-                    // TODO: Handle a primary value being next to the expression
-                    .left => new_expr.* = .{ .move_left = null },
-                    .right => new_expr.* = .{ .move_right = null },
-                    .up => new_expr.* = .{ .move_up = null },
-                    .down => new_expr.* = .{ .move_down = null },
+                    .move => try self.move_statement(new_expr),
+                    else => return error.UnexpectedKeyword,
                 }
-
-                self.advance();
-                try self.consume(.semicolon);
 
                 return new_expr;
             },

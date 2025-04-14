@@ -1,10 +1,15 @@
 const std = @import("std");
+const Keyword = @import("../tokenizer.zig").Keyword;
+
+pub const Direction = enum {
+    left,
+    right,
+    up,
+    down,
+};
 
 pub const Expression = union(enum) {
-    move_left: ?*const Expression,
-    move_right: ?*const Expression,
-    move_up: ?*const Expression,
-    move_down: ?*const Expression,
+    move: struct { Direction, ?*const Expression },
 
     grouping: *const Expression,
 
@@ -35,40 +40,26 @@ pub const Expression = union(enum) {
                 try writer.print("{}{}", .{ un.@"1", un.@"0" });
             },
 
-            .move_left => |e| {
-                if (e) |ex| {
-                    try writer.print("left {}", .{ex});
+            .move => |e| {
+                if (e.@"1") |ex| {
+                    try writer.print("move {} {}", .{ e.@"0", ex });
                 } else {
-                    try writer.print("left", .{});
-                }
-            },
-
-            .move_right => |e| {
-                if (e) |ex| {
-                    try writer.print("right {}", .{ex});
-                } else {
-                    try writer.print("right", .{});
-                }
-            },
-
-            .move_up => |e| {
-                if (e) |ex| {
-                    try writer.print("up {}", .{ex});
-                } else {
-                    try writer.print("up", .{});
-                }
-            },
-
-            .move_down => |e| {
-                if (e) |ex| {
-                    try writer.print("down {}", .{ex});
-                } else {
-                    try writer.print("down", .{});
+                    try writer.print("move {}", .{e.@"0"});
                 }
             },
         }
     }
 };
+
+pub fn direction_from_keyword(key: Keyword) ?Direction {
+    return switch (key) {
+        .up => .up,
+        .down => .down,
+        .left => .left,
+        .right => .right,
+        else => null,
+    };
+}
 
 pub const Literal = union(enum) {
     number: f32,

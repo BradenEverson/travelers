@@ -1,19 +1,13 @@
 const Expression = @import("./parser/expression.zig").Expression;
 const std = @import("std");
 const Literal = @import("./parser/expression.zig").Literal;
+const Direction = @import("./parser/expression.zig").Direction;
 
 pub const RuntimeError = error{
     WrongLiteralType,
 };
 
 pub const EvaluatorError = RuntimeError;
-
-pub const Direction = enum {
-    left,
-    right,
-    up,
-    down,
-};
 
 pub const EvaluatorVtable = struct {
     move_fn: *const fn (Direction, i32) void,
@@ -35,24 +29,9 @@ pub const Evaluator = struct {
 
     pub fn eval(self: *Evaluator, ast: *const Expression) EvaluatorError!Literal {
         switch (ast.*) {
-            .move_left => |times| {
-                if (times) |expr| {
-                    _ = expr;
-                    @panic("Implement expression running for how many moves");
-                } else {
-                    self.vtable.move_fn(.left, 1);
-                    return .void;
-                }
-            },
-
-            .move_right => |times| {
-                if (times) |expr| {
-                    _ = expr;
-                    @panic("Implement expression running for how many moves");
-                } else {
-                    self.vtable.move_fn(.right, 1);
-                    return .void;
-                }
+            .move => |moveinfo| {
+                self.vtable.move_fn(moveinfo.@"0", 1);
+                return .void;
             },
 
             else => @panic("Unimplemented expression"),
