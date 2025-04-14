@@ -69,7 +69,7 @@ let importObject = {
             drawGrid();
         },
 
-        log: (ptr, len) => {
+        log_js: (ptr, len) => {
             const buffer = new Uint8Array(memory.buffer, ptr, len);
             const str = new TextDecoder().decode(buffer);
             console.log(str);

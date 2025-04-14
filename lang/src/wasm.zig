@@ -1,5 +1,6 @@
 //! Main wasm runtime
 
+const console = @import("./wasm/core.zig");
 const std = @import("std");
 const Expression = @import("./parser/expression.zig").Expression;
 const tokenizer = @import("./tokenizer.zig");
@@ -9,7 +10,6 @@ const Direction = @import("./parser/expression.zig").Direction;
 
 pub extern "env" fn updatePosition(x: u32, y: u32) void;
 pub extern "env" fn moveRelative(dx: i32, dy: i32) void;
-pub extern "env" fn log(ptr: [*]const u8, len: usize) void;
 
 const allocator = std.heap.wasm_allocator;
 
@@ -46,10 +46,6 @@ fn move(dir: Direction, amount: usize) void {
     }
 }
 
-fn consoleLog(msg: []const u8) void {
-    log(msg.ptr, msg.len);
-}
-
 export fn alloc(len: u32) [*]const u8 {
     const slice = allocator.alloc(u8, len) catch @panic("Allocating went wrong");
     return slice.ptr;
@@ -77,7 +73,7 @@ fn loadProgramInner(prog: [*]u8, len: usize) !void {
 
     const stream = prog[0..len];
     // const string = try std.fmt.allocPrint(allocator, "'{s}'\n", .{stream});
-    // consoleLog(string);
+    // console.log(string);
 
     try tokenizer.tokenize(stream, &stream_buf, null);
 
