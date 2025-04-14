@@ -100,9 +100,8 @@ WebAssembly.instantiateStreaming(fetch("wasm/traveler_wasm.wasm"), importObject)
         }
 
         const code = document.getElementById("code").value;
-        console.log(code);
         const [ptr, len] = stringToPtr(code);
-        console.log(result.instance.exports.loadProgram(ptr, len));
+        result.instance.exports.loadProgram(ptr, len);
     });
 
     setInterval(() => {
