@@ -84,6 +84,8 @@ pub const TokenTag = union(enum) {
     semicolon,
     openparen,
     closeparen,
+    openbrace,
+    closebrace,
     eof,
 
     pub fn format(self: *const TokenTag, _: []const u8, _: std.fmt.FormatOptions, writer: anytype) !void {
@@ -111,6 +113,8 @@ pub const TokenTag = union(enum) {
             .lt => try writer.print("LT", .{}),
             .openparen => try writer.print("OpenParen", .{}),
             .closeparen => try writer.print("CloseParen", .{}),
+            .openbrace => try writer.print("OpenBrace", .{}),
+            .closebrace => try writer.print("CloseBrace", .{}),
             .lte => try writer.print("LTE", .{}),
             .star => try writer.print("Star", .{}),
             .semicolon => try writer.print("Semicolon", .{}),
@@ -140,6 +144,9 @@ pub fn tokenize(stream: []const u8, buf: *ArrayList(Token), err_ctx: ?*ErrorCont
             '/' => .slash,
             '*' => .star,
             ';' => .semicolon,
+
+            '{' => .openbrace,
+            '}' => .closebrace,
 
             '(' => .openparen,
             ')' => .closeparen,

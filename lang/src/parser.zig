@@ -115,6 +115,7 @@ pub const Parser = struct {
 
                 return new_expr;
             },
+            .openbrace => return self.block(),
             else => {
                 const e = try self.expression();
                 try self.consume(.semicolon);
@@ -127,6 +128,22 @@ pub const Parser = struct {
         return switch (self.peek().?) {
             else => try self.equality(),
         };
+    }
+
+    fn block(self: *Parser) ParserError!*Expression {
+        try self.consume(.openbrace);
+        var items = std.ArrayList(*const Expression).init(self.allocator());
+
+        while (!std.meta.eql(self.peek().?, .closebrace)) {
+            const expr = try self.statement();
+            try items.append(expr);
+        }
+
+        try self.consume(.closebrace);
+
+        const new_expr = try self.allocator().create(Expression);
+        new_expr.* = .{ .block = items.items };
+        return new_expr;
     }
 
     fn equality(self: *Parser) ParserError!*Expression {

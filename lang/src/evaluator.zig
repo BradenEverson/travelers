@@ -47,6 +47,14 @@ pub const Evaluator = struct {
                 return bin.@"1".eval(left, right);
             },
 
+            .block => |statements| {
+                for (statements) |statement| {
+                    _ = try self.eval(statement);
+                }
+
+                return .void;
+            },
+
             else => @panic("Unimplemented expression"),
         }
     }

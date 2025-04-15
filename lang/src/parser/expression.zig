@@ -12,7 +12,7 @@ pub const Direction = enum {
 pub const Expression = union(enum) {
     move: struct { Direction, ?*const Expression },
 
-    block: struct { std.ArrayList(*const Expression) },
+    block: []*const Expression,
 
     grouping: *const Expression,
 
@@ -51,7 +51,15 @@ pub const Expression = union(enum) {
                 }
             },
 
-            else => @panic("todo!"),
+            .block => |statements| {
+                try writer.print("{{\n", .{});
+
+                for (statements) |statement| {
+                    try writer.print("\t{}\n", .{statement});
+                }
+
+                try writer.print("}}", .{});
+            },
         }
     }
 };
