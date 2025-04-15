@@ -48,11 +48,12 @@ pub const Evaluator = struct {
             },
 
             .block => |statements| {
+                var final: Literal = .void;
                 for (statements) |statement| {
-                    _ = try self.eval(statement);
+                    final = try self.eval(statement);
                 }
 
-                return .void;
+                return final;
             },
 
             else => @panic("Unimplemented expression"),
