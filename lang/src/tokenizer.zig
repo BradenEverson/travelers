@@ -36,7 +36,11 @@ pub const Keyword = enum {
     up,
     down,
     move,
+    if_key,
+    else_key,
 
+    true_key,
+    false_key,
     const mappings = std.StaticStringMap(Keyword).initComptime(.{
         .{ "left", .left },
         .{ "right", .right },
@@ -48,6 +52,11 @@ pub const Keyword = enum {
         .{ "u", .up },
         .{ "d", .down },
         .{ "mv", .move },
+        .{ "if", .if_key },
+        .{ "else", .else_key },
+
+        .{ "true", .true_key },
+        .{ "false", .false_key },
     });
 
     pub fn format(self: *const Keyword, _: []const u8, _: std.fmt.FormatOptions, writer: anytype) !void {
@@ -57,6 +66,12 @@ pub const Keyword = enum {
             .up => try writer.print("up", .{}),
             .down => try writer.print("down", .{}),
             .move => try writer.print("move", .{}),
+
+            .if_key => try writer.print("if", .{}),
+            .else_key => try writer.print("else", .{}),
+
+            .true_key => try writer.print("true", .{}),
+            .false_key => try writer.print("false", .{}),
         }
     }
 

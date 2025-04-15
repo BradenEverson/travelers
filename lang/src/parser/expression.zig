@@ -9,10 +9,18 @@ pub const Direction = enum {
     down,
 };
 
+pub const IfStatement = struct {
+    check: *const Expression,
+    true_branch: *const Expression,
+    else_branch: ?*const Expression,
+};
+
 pub const Expression = union(enum) {
     move: struct { Direction, ?*const Expression },
 
     block: []*const Expression,
+
+    if_statement: IfStatement,
 
     grouping: *const Expression,
 
@@ -60,6 +68,8 @@ pub const Expression = union(enum) {
 
                 try writer.print("}}", .{});
             },
+
+            else => @panic("implement"),
         }
     }
 };

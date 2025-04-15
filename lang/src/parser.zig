@@ -103,6 +103,23 @@ pub const Parser = struct {
         return self.consume(.semicolon);
     }
 
+    fn if_statement(self: *Parser, expr: *Expression) ParserError!void {
+        try self.consume(.{ .keyword = .if_key });
+        try self.consume(.openparen);
+
+        const check = try self.expression();
+        try self.consume(.closeparen);
+        const exec = try self.block();
+
+        var else_branch: ?*const Expression = null;
+        if (std.meta.eql(self.peek().?, .{ .keyword = .else_key })) {
+            self.advance();
+            else_branch = try self.statement();
+        }
+
+        expr.* = .{ .if_statement = .{ .check = check, .true_branch = exec, .else_branch = else_branch } };
+    }
+
     fn statement(self: *Parser) ParserError!*Expression {
         const tag = self.peek().?;
         switch (tag) {
@@ -110,7 +127,12 @@ pub const Parser = struct {
                 const new_expr = try self.allocator().create(Expression);
                 switch (key) {
                     .move => try self.move_statement(new_expr),
-                    else => return error.UnexpectedKeyword,
+                    .if_key => try self.if_statement(new_expr),
+                    else => {
+                        const e = try self.expression();
+                        try self.consume(.semicolon);
+                        return e;
+                    },
                 }
 
                 return new_expr;
@@ -300,6 +322,23 @@ pub const Parser = struct {
 
     fn primary(self: *Parser) ParserError!*Expression {
         const prim = val: switch (self.peek().?) {
+            .keyword => |k| switch (k) {
+                .true_key => {
+                    self.advance();
+                    const boolean = try self.allocator().create(Expression);
+                    boolean.* = .{ .literal = .{ .boolean = true } };
+
+                    break :val boolean;
+                },
+                .false_key => {
+                    self.advance();
+                    const boolean = try self.allocator().create(Expression);
+                    boolean.* = .{ .literal = .{ .boolean = false } };
+
+                    break :val boolean;
+                },
+                else => return error.UnexpectedKeyword,
+            },
             .number => |n| {
                 self.advance();
                 const num = try self.allocator().create(Expression);

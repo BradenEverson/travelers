@@ -56,6 +56,20 @@ pub const Evaluator = struct {
                 return final;
             },
 
+            .if_statement => |if_stmt| {
+                var final: Literal = .void;
+
+                const result = try self.eval(if_stmt.check);
+                const truthy = try result.truthy();
+                if (truthy) {
+                    final = try self.eval(if_stmt.true_branch);
+                } else if (if_stmt.else_branch) |el| {
+                    final = try self.eval(el);
+                }
+
+                return final;
+            },
+
             else => @panic("Unimplemented expression"),
         }
     }
