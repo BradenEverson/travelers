@@ -12,6 +12,8 @@ pub const Direction = enum {
 pub const Expression = union(enum) {
     move: struct { Direction, ?*const Expression },
 
+    block: struct { std.ArrayList(*const Expression) },
+
     grouping: *const Expression,
 
     literal: Literal,
