@@ -43,6 +43,11 @@ pub const Keyword = enum {
         .{ "up", .up },
         .{ "down", .down },
         .{ "move", .move },
+        .{ "l", .left },
+        .{ "r", .right },
+        .{ "u", .up },
+        .{ "d", .down },
+        .{ "mv", .move },
     });
 
     pub fn format(self: *const Keyword, _: []const u8, _: std.fmt.FormatOptions, writer: anytype) !void {

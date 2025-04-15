@@ -50,6 +50,8 @@ pub const Expression = union(enum) {
                     try writer.print("move {}", .{e.@"0"});
                 }
             },
+
+            else => @panic("todo!"),
         }
     }
 };
