@@ -14,6 +14,7 @@ pub const EvaluatorError = RuntimeError || std.mem.Allocator.Error;
 pub const EvaluatorVtable = struct {
     move_fn: *const fn (Direction, usize) void,
     print_fn: ?*const fn (Literal) void,
+    block_fn: ?*const fn ([]*const Expression) void,
 };
 
 pub const Evaluator = struct {
@@ -60,12 +61,17 @@ pub const Evaluator = struct {
             },
 
             .block => |statements| {
-                var final: Literal = .void;
-                for (statements) |statement| {
-                    final = try self.eval(statement);
-                }
+                if (self.vtable.block_fn) |bf| {
+                    bf(statements);
+                    return .void;
+                } else {
+                    var final: Literal = .void;
+                    for (statements) |statement| {
+                        final = try self.eval(statement);
+                    }
 
-                return final;
+                    return final;
+                }
             },
 
             .if_statement => |if_stmt| {

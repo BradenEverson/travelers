@@ -72,7 +72,7 @@ pub const Parser = struct {
         return self.peek().? == .eof;
     }
 
-    pub fn parse(self: *Parser, statements: *std.ArrayList(*Expression)) ParserError!void {
+    pub fn parse(self: *Parser, statements: *std.ArrayList(*const Expression)) ParserError!void {
         while (!self.at_end()) {
             const s = try self.statement();
             try statements.append(s);

@@ -65,7 +65,7 @@ pub fn main() !void {
         },
     };
 
-    var statements = ArrayList(*Expression).init(allocator);
+    var statements = ArrayList(*const Expression).init(allocator);
     defer statements.deinit();
 
     for (stream_buf.items) |token| {

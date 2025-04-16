@@ -17,10 +17,10 @@ pub extern "env" fn moveRelative(dx: i32, dy: i32) void;
 const allocator = std.heap.wasm_allocator;
 
 var pc: usize = 0;
-var instructions = std.ArrayList(*Expression).init(allocator);
+var instructions = std.ArrayList(*const Expression).init(allocator);
 
 var parser = Parser.init(null, allocator);
-var runtime = Evaluator.init(allocator, .{ .move_fn = enqueueMove, .print_fn = null });
+var runtime = Evaluator.init(allocator, .{ .move_fn = enqueueMove, .print_fn = null, .block_fn = blockStatement });
 
 const Move = struct {
     dir: Direction,
@@ -37,6 +37,12 @@ fn enqueueMove(dir: Direction, amount: usize) void {
         node.*.data = mv;
 
         move_queue.append(node);
+    }
+}
+
+fn blockStatement(block: []*const Expression) void {
+    for (block) |b| {
+        instructions.insert(pc, b) catch @panic("Big Problem");
     }
 }
 
