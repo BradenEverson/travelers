@@ -9,7 +9,7 @@ const UnaryOp = expression.UnaryOp;
 const Token = tokenizer.Token;
 const TokenTag = tokenizer.TokenTag;
 
-pub const ParseError = error{ ExpectedTokenFound, UnexpectedKeyword };
+pub const ParseError = error{ ExpectedTokenFound, UnexpectedKeyword, ExpectedIdentifier };
 
 pub const ParserError = ParseError || std.mem.Allocator.Error;
 
@@ -120,12 +120,30 @@ pub const Parser = struct {
         expr.* = .{ .if_statement = .{ .check = check, .true_branch = exec, .else_branch = else_branch } };
     }
 
+    fn assignment_statement(self: *Parser, new_expr: *Expression) !void {
+        try self.consume(.{ .keyword = .let });
+
+        switch (self.peek().?) {
+            .ident => |i| {
+                self.advance();
+                try self.consume(.equals);
+                const next = try self.expression();
+
+                try self.consume(.semicolon);
+
+                new_expr.* = .{ .assignment = .{ .name = i, .eval_to = next } };
+            },
+            else => return error.ExpectedIdentifier,
+        }
+    }
+
     fn statement(self: *Parser) ParserError!*Expression {
         const tag = self.peek().?;
         switch (tag) {
             .keyword => |key| {
                 const new_expr = try self.allocator().create(Expression);
                 switch (key) {
+                    .let => try self.assignment_statement(new_expr),
                     .move => try self.move_statement(new_expr),
                     .if_key => try self.if_statement(new_expr),
                     else => {
@@ -322,6 +340,13 @@ pub const Parser = struct {
 
     fn primary(self: *Parser) ParserError!*Expression {
         const prim = val: switch (self.peek().?) {
+            .ident => |i| {
+                self.advance();
+                const v = try self.allocator().create(Expression);
+                v.* = .{ .variable = i };
+
+                break :val v;
+            },
             .keyword => |k| switch (k) {
                 .true_key => {
                     self.advance();

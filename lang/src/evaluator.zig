@@ -2,12 +2,14 @@ const Expression = @import("./parser/expression.zig").Expression;
 const std = @import("std");
 const Literal = @import("./parser/expression.zig").Literal;
 const Direction = @import("./parser/expression.zig").Direction;
+const OwnedScope = @import("./evaluator/scope.zig").OwnedScope;
 
 pub const RuntimeError = error{
     WrongLiteralType,
+    UninitializedVariable,
 };
 
-pub const EvaluatorError = RuntimeError;
+pub const EvaluatorError = RuntimeError || std.mem.Allocator.Error;
 
 pub const EvaluatorVtable = struct {
     move_fn: *const fn (Direction, usize) void,
@@ -16,13 +18,13 @@ pub const EvaluatorVtable = struct {
 
 pub const Evaluator = struct {
     allocator: std.mem.Allocator,
-    scope: std.AutoHashMap([]const u8, Literal),
+    scope: OwnedScope,
     vtable: EvaluatorVtable,
 
     pub fn init(allocator: std.mem.Allocator, vtable: EvaluatorVtable) Evaluator {
         return Evaluator{
             .allocator = allocator,
-            .scope = std.AutoHashMap([]const u8, Literal).init(allocator),
+            .scope = OwnedScope.init(allocator),
             .vtable = vtable,
         };
     }
@@ -76,7 +78,24 @@ pub const Evaluator = struct {
                 return final;
             },
 
-            else => @panic("Unimplemented expression"),
+            .grouping => |inner| {
+                return self.eval(inner);
+            },
+
+            .assignment => |assign| {
+                const assigned = try self.eval(assign.eval_to);
+                try self.scope.register(assign.name, assigned);
+
+                return .void;
+            },
+
+            .variable => |name| {
+                if (self.scope.get(name)) |val| {
+                    return val;
+                } else {
+                    return error.UninitializedVariable;
+                }
+            },
         }
     }
 };

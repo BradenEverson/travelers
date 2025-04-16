@@ -15,6 +15,11 @@ pub const IfStatement = struct {
     else_branch: ?*const Expression,
 };
 
+pub const Assignment = struct {
+    name: []const u8,
+    eval_to: *const Expression,
+};
+
 pub const Expression = union(enum) {
     move: struct { Direction, ?*const Expression },
 
@@ -25,6 +30,10 @@ pub const Expression = union(enum) {
     grouping: *const Expression,
 
     literal: Literal,
+
+    variable: []const u8,
+    assignment: Assignment,
+
     binary_op: struct { *const Expression, BinaryOp, *const Expression },
     unary_op: struct { *const Expression, UnaryOp },
 
@@ -35,6 +44,13 @@ pub const Expression = union(enum) {
         writer: anytype,
     ) !void {
         switch (self.*) {
+            .assignment => |a| {
+                try writer.print("let {s} = {};", .{ a.name, a.eval_to });
+            },
+            .variable => |v| {
+                try writer.print("{s}", .{v});
+            },
+
             .grouping => |inner| {
                 try writer.print("({})", .{inner});
             },

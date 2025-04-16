@@ -2,7 +2,7 @@ let memory = new WebAssembly.Memory({
     initial: 2,
 });
 
-const customKeywords = ["move", "mv", "left", "l", "right", "r", "up", "u", "down", "d"];
+const customKeywords = ["move", "left", "right", "up", "down"];
 
 editor = CodeMirror.fromTextArea(document.getElementById('code'), {
     mode: {
@@ -148,7 +148,8 @@ WebAssembly.instantiateStreaming(fetch("wasm/traveler_wasm.wasm"), importObject)
 
         const code = editor.getValue();
         const [ptr, len] = stringToPtr(code);
-        result.instance.exports.loadProgram(ptr, len);
+        const res = result.instance.exports.loadProgram(ptr, len);
+        console.log(res);
     });
 
     setInterval(() => {
