@@ -2,6 +2,53 @@ let memory = new WebAssembly.Memory({
     initial: 2,
 });
 
+const customKeywords = ["move", "mv", "left", "l", "right", "r", "up", "u", "down", "d"];
+
+editor = CodeMirror.fromTextArea(document.getElementById('code'), {
+    mode: {
+        name: "javascript",
+        extraKeywords: customKeywords.join(" ")
+    },
+    theme: "dracula",
+    lineNumbers: true,
+    tabSize: 2,
+    indentUnit: 2,
+    lineWrapping: true,
+    autoCloseBrackets: true,
+    extraKeys: {
+        "Tab": (cm) => {
+            if (cm.somethingSelected()) cm.indentSelection("add");
+            else cm.execCommand("insertSoftTab");
+        },
+        "Ctrl-Space": "autocomplete"
+    },
+    gutters: ["CodeMirror-linenumbers"]
+});
+
+editor.on('inputRead', (cm, input) => {
+    if (input.text && input.text[0].trim()) {
+        CodeMirror.commands.autocomplete(cm, null, {
+            completeSingle: false,
+            hint: () => {
+                const cur = cm.getCursor();
+                const token = cm.getTokenAt(cur);
+                const word = token.string;
+                const list = [
+                    ...customKeywords,
+                    ...["if", "else", "let", "for", "while"]
+                ].filter(kw => kw.startsWith(word))
+                    .map(kw => ({text: kw}));
+
+                return {
+                    list: list,
+                    from: CodeMirror.Pos(cur.line, token.start),
+                    to: CodeMirror.Pos(cur.line, token.end)
+                };
+            }
+        });
+    }
+});
+
 let x = 0;
 let y = 0;
 
@@ -99,7 +146,7 @@ WebAssembly.instantiateStreaming(fetch("wasm/traveler_wasm.wasm"), importObject)
             return;
         }
 
-        const code = document.getElementById("code").value;
+        const code = editor.getValue();
         const [ptr, len] = stringToPtr(code);
         result.instance.exports.loadProgram(ptr, len);
     });
