@@ -2,7 +2,7 @@ let memory = new WebAssembly.Memory({
     initial: 2,
 });
 
-const customKeywords = ["move", "left", "right", "up", "down"];
+const customKeywords = ["move", "left", "right", "up", "down", "if", "else", "let", "while", "for", "true", "false", "and", "or"];
 
 editor = CodeMirror.fromTextArea(document.getElementById('code'), {
     mode: {
@@ -33,10 +33,8 @@ editor.on('inputRead', (cm, input) => {
                 const cur = cm.getCursor();
                 const token = cm.getTokenAt(cur);
                 const word = token.string;
-                const list = [
-                    ...customKeywords,
-                    ...["if", "else", "let", "for", "while"]
-                ].filter(kw => kw.startsWith(word))
+                const list = customKeywords
+                .filter(kw => kw.startsWith(word))
                     .map(kw => ({text: kw}));
 
                 return {
