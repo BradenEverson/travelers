@@ -89,6 +89,11 @@ pub const Literal = union(enum) {
     boolean: bool,
     void,
 
+    pub fn eql(self: *const Literal, other: Literal) bool {
+        // Might become more complex in the future if we encorporate strings, that's why it's its own fn
+        return std.meta.eql(self.*, other);
+    }
+
     pub fn truthy(self: *const Literal) RuntimeError!bool {
         return switch (self.*) {
             .number => |n| n != 0,
@@ -168,7 +173,36 @@ pub const BinaryOp = enum {
                 return .{ .number = l / r };
             },
 
-            else => @panic("unimplemented binary op"),
+            .equal => return .{ .boolean = left.eql(right) },
+            .not_equal => return .{ .boolean = !left.eql(right) },
+
+            .gt => {
+                const l = try left.numeric();
+                const r = try right.numeric();
+
+                return .{ .boolean = l > r };
+            },
+
+            .lt => {
+                const l = try left.numeric();
+                const r = try right.numeric();
+
+                return .{ .boolean = l < r };
+            },
+
+            .gte => {
+                const l = try left.numeric();
+                const r = try right.numeric();
+
+                return .{ .boolean = l >= r };
+            },
+
+            .lte => {
+                const l = try left.numeric();
+                const r = try right.numeric();
+
+                return .{ .boolean = l <= r };
+            },
         };
     }
 
