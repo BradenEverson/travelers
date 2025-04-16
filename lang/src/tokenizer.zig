@@ -38,9 +38,14 @@ pub const Keyword = enum {
     move,
     if_key,
     else_key,
+    for_key,
+
+    let,
 
     true_key,
     false_key,
+
+    while_key,
     const mappings = std.StaticStringMap(Keyword).initComptime(.{
         .{ "left", .left },
         .{ "right", .right },
@@ -50,6 +55,9 @@ pub const Keyword = enum {
 
         .{ "if", .if_key },
         .{ "else", .else_key },
+        .{ "while", .while_key },
+        .{ "for", .for_key },
+        .{ "let", .let },
 
         .{ "true", .true_key },
         .{ "false", .false_key },
@@ -65,6 +73,10 @@ pub const Keyword = enum {
 
             .if_key => try writer.print("if", .{}),
             .else_key => try writer.print("else", .{}),
+            .while_key => try writer.print("while", .{}),
+            .for_key => try writer.print("for", .{}),
+
+            .let => try writer.print("let", .{}),
 
             .true_key => try writer.print("true", .{}),
             .false_key => try writer.print("false", .{}),
