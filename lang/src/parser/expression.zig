@@ -69,7 +69,12 @@ pub const Expression = union(enum) {
                 try writer.print("}}", .{});
             },
 
-            else => @panic("implement"),
+            .if_statement => |is| {
+                try writer.print("if ({}) {}\n", .{ is.check, is.true_branch });
+                if (is.else_branch) |el| {
+                    try writer.print("else {}", .{el});
+                }
+            },
         }
     }
 };
@@ -229,6 +234,19 @@ pub const BinaryOp = enum {
 pub const UnaryOp = enum {
     not,
     neg,
+
+    pub fn eval(self: *const UnaryOp, val: Literal) RuntimeError!Literal {
+        switch (self.*) {
+            .not => {
+                const b = try val.truthy();
+                return .{ .boolean = !b };
+            },
+            .neg => {
+                const n = try val.numeric();
+                return .{ .number = -n };
+            },
+        }
+    }
 
     pub fn format(
         self: *const UnaryOp,

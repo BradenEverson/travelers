@@ -47,6 +47,12 @@ pub const Evaluator = struct {
                 return bin.@"1".eval(left, right);
             },
 
+            .unary_op => |un| {
+                const val = try self.eval(un.@"0");
+
+                return un.@"1".eval(val);
+            },
+
             .block => |statements| {
                 var final: Literal = .void;
                 for (statements) |statement| {
