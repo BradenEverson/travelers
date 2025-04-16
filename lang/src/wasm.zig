@@ -20,24 +20,30 @@ var pc: usize = 0;
 var instructions = std.ArrayList(*const Expression).init(allocator);
 
 var parser = Parser.init(null, allocator);
-var runtime = Evaluator.init(allocator, .{ .move_fn = enqueueMove, .print_fn = null, .block_fn = blockStatement });
+var runtime = Evaluator.init(allocator, .{ .move_fn = enqueueMove, .print_fn = null, .block_fn = blockStatement, .while_fn = whileStatement });
 
-const Move = struct {
-    dir: Direction,
+const Action = union(enum) {
+    move: Direction,
 };
 
-const MoveQueue = std.DoublyLinkedList(Move);
+const MoveQueue = std.DoublyLinkedList(Action);
 var move_queue = MoveQueue{};
 
 fn enqueueMove(dir: Direction, amount: usize) void {
     for (0..amount) |_| {
-        const mv = Move{ .dir = dir };
+        const mv = Action{ .move = dir };
 
         const node = allocator.create(MoveQueue.Node) catch @panic("Allocation problems");
         node.*.data = mv;
 
         move_queue.append(node);
     }
+}
+
+fn whileStatement(pushed: *const Expression) void {
+    const curr = instructions.items[pc];
+    instructions.insert(pc + 1, pushed) catch @panic("Big Problem");
+    instructions.insert(pc + 2, curr) catch @panic("Big Problem");
 }
 
 fn blockStatement(block: []*const Expression) void {
@@ -48,7 +54,7 @@ fn blockStatement(block: []*const Expression) void {
         pc += 1;
     }
 
-    pc = tmp;
+    pc = tmp - 1;
 }
 
 fn move(dir: Direction, amount: usize) void {
@@ -111,12 +117,12 @@ fn stepInner() !void {
         const curr = instructions.items[pc];
         _ = try runtime.eval(curr);
 
-        if (curr.should_update_pc()) {
-            pc += 1;
-        }
+        pc += 1;
     }
 
     if (move_queue.popFirst()) |mv| {
-        move(mv.*.data.dir, 1);
+        switch (mv.*.data) {
+            .move => |dir| move(dir, 1),
+        }
     }
 }

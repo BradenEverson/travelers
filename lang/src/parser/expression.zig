@@ -20,6 +20,11 @@ pub const Assignment = struct {
     eval_to: *const Expression,
 };
 
+pub const WhileLoop = struct {
+    cond: *const Expression,
+    do: *const Expression,
+};
+
 pub const Expression = union(enum) {
     move: struct { Direction, ?*const Expression },
 
@@ -34,15 +39,10 @@ pub const Expression = union(enum) {
     variable: []const u8,
     assignment: Assignment,
 
+    while_loop: WhileLoop,
+
     binary_op: struct { *const Expression, BinaryOp, *const Expression },
     unary_op: struct { *const Expression, UnaryOp },
-
-    pub fn should_update_pc(self: *const Expression) bool {
-        switch (self.*) {
-            .block => |_| return false,
-            else => return true,
-        }
-    }
 
     pub fn format(
         self: *const Expression,
@@ -97,6 +97,10 @@ pub const Expression = union(enum) {
                 if (is.else_branch) |el| {
                     try writer.print("else {}", .{el});
                 }
+            },
+
+            .while_loop => |wl| {
+                try writer.print("while ({}) {}\n", .{ wl.cond, wl.do });
             },
         }
     }

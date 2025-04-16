@@ -15,6 +15,7 @@ pub const EvaluatorVtable = struct {
     move_fn: *const fn (Direction, usize) void,
     print_fn: ?*const fn (Literal) void,
     block_fn: ?*const fn ([]*const Expression) void,
+    while_fn: *const fn (*const Expression) void,
 };
 
 pub const Evaluator = struct {
@@ -105,6 +106,15 @@ pub const Evaluator = struct {
                 } else {
                     return error.UninitializedVariable;
                 }
+            },
+
+            .while_loop => |wl| {
+                const cond = try self.eval(wl.cond);
+                if (try cond.truthy()) {
+                    self.vtable.while_fn(wl.do);
+                }
+
+                return .void;
             },
         }
     }

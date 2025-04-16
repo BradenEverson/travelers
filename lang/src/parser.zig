@@ -103,6 +103,16 @@ pub const Parser = struct {
         return self.consume(.semicolon);
     }
 
+    fn while_loop(self: *Parser, expr: *Expression) ParserError!void {
+        try self.consume(.{ .keyword = .while_key });
+        try self.consume(.openparen);
+        const cond = try self.expression();
+        try self.consume(.closeparen);
+        const do = try self.block();
+
+        expr.* = .{ .while_loop = .{ .cond = cond, .do = do } };
+    }
+
     fn if_statement(self: *Parser, expr: *Expression) ParserError!void {
         try self.consume(.{ .keyword = .if_key });
         try self.consume(.openparen);
@@ -146,6 +156,7 @@ pub const Parser = struct {
                     .let => try self.assignment_statement(new_expr),
                     .move => try self.move_statement(new_expr),
                     .if_key => try self.if_statement(new_expr),
+                    .while_key => try self.while_loop(new_expr),
                     else => {
                         const e = try self.expression();
                         try self.consume(.semicolon);
