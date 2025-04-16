@@ -45,6 +45,9 @@ pub const Keyword = enum {
     true_key,
     false_key,
 
+    and_key,
+    or_key,
+
     while_key,
     const mappings = std.StaticStringMap(Keyword).initComptime(.{
         .{ "left", .left },
@@ -61,6 +64,9 @@ pub const Keyword = enum {
 
         .{ "true", .true_key },
         .{ "false", .false_key },
+
+        .{ "and", .and_key },
+        .{ "or", .or_key },
     });
 
     pub fn format(self: *const Keyword, _: []const u8, _: std.fmt.FormatOptions, writer: anytype) !void {
@@ -80,6 +86,8 @@ pub const Keyword = enum {
 
             .true_key => try writer.print("true", .{}),
             .false_key => try writer.print("false", .{}),
+            .and_key => try writer.print("and", .{}),
+            .or_key => try writer.print("or", .{}),
         }
     }
 

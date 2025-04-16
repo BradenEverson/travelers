@@ -174,6 +174,8 @@ pub const BinaryOp = enum {
     gte,
     lt,
     lte,
+    and_op,
+    or_op,
 
     pub fn eval(self: *const BinaryOp, left: Literal, right: Literal) RuntimeError!Literal {
         return switch (self.*) {
@@ -203,6 +205,20 @@ pub const BinaryOp = enum {
                 const r = try right.numeric();
 
                 return .{ .number = l / r };
+            },
+
+            .and_op => {
+                const l = try left.truthy();
+                const r = try right.truthy();
+
+                return .{ .boolean = l and r };
+            },
+
+            .or_op => {
+                const l = try left.truthy();
+                const r = try right.truthy();
+
+                return .{ .boolean = l or r };
             },
 
             .equal => return .{ .boolean = left.eql(right) },
@@ -255,6 +271,9 @@ pub const BinaryOp = enum {
             .gte => try writer.print(">=", .{}),
             .lt => try writer.print("<", .{}),
             .lte => try writer.print("<=", .{}),
+
+            .and_op => try writer.print("and", .{}),
+            .or_op => try writer.print("or", .{}),
         }
     }
 };

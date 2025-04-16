@@ -177,7 +177,7 @@ pub const Parser = struct {
 
     fn expression(self: *Parser) ParserError!*Expression {
         return switch (self.peek().?) {
-            else => try self.equality(),
+            else => try self.chained(),
         };
     }
 
@@ -195,6 +195,36 @@ pub const Parser = struct {
         const new_expr = try self.allocator().create(Expression);
         new_expr.* = .{ .block = items.items };
         return new_expr;
+    }
+
+    fn chained(self: *Parser) ParserError!*Expression {
+        var expr = try self.equality();
+        grow: switch (self.peek().?) {
+            .keyword => |key| {
+                const op: BinaryOp = switch (key) {
+                    .and_key => .and_op,
+                    .or_key => .or_op,
+                    else => return error.UnexpectedKeyword,
+                };
+                self.advance();
+
+                const right = try self.equality();
+
+                const new_expr = try self.allocator().create(Expression);
+                new_expr.* = .{
+                    .binary_op = .{
+                        expr,
+                        op,
+                        right,
+                    },
+                };
+                expr = new_expr;
+                continue :grow self.peek().?;
+            },
+            else => {},
+        }
+
+        return expr;
     }
 
     fn equality(self: *Parser) ParserError!*Expression {
