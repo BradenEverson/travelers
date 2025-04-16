@@ -41,9 +41,14 @@ fn enqueueMove(dir: Direction, amount: usize) void {
 }
 
 fn blockStatement(block: []*const Expression) void {
+    pc += 1;
+    const tmp = pc;
     for (block) |b| {
         instructions.insert(pc, b) catch @panic("Big Problem");
+        pc += 1;
     }
+
+    pc = tmp;
 }
 
 fn move(dir: Direction, amount: usize) void {
@@ -103,9 +108,12 @@ export fn step() i32 {
 /// Internal step function that can return an error, masked by the exported step function
 fn stepInner() !void {
     if (pc < instructions.items.len and move_queue.len == 0) {
-        _ = try runtime.eval(instructions.items[pc]);
+        const curr = instructions.items[pc];
+        _ = try runtime.eval(curr);
 
-        pc += 1;
+        if (curr.should_update_pc()) {
+            pc += 1;
+        }
     }
 
     if (move_queue.popFirst()) |mv| {

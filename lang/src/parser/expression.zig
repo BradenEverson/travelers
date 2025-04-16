@@ -37,6 +37,13 @@ pub const Expression = union(enum) {
     binary_op: struct { *const Expression, BinaryOp, *const Expression },
     unary_op: struct { *const Expression, UnaryOp },
 
+    pub fn should_update_pc(self: *const Expression) bool {
+        switch (self.*) {
+            .block => |_| return false,
+            else => return true,
+        }
+    }
+
     pub fn format(
         self: *const Expression,
         _: []const u8,
