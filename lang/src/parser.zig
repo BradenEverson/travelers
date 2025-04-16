@@ -414,7 +414,7 @@ pub const Parser = struct {
             },
             .openparen => {
                 self.advance();
-                const inner = try self.equality();
+                const inner = try self.expression();
 
                 const grouping = try self.allocator().create(Expression);
                 grouping.* = .{ .grouping = inner };
