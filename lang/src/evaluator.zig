@@ -21,6 +21,10 @@ pub const Evaluator = struct {
     scope: OwnedScope,
     vtable: EvaluatorVtable,
 
+    pub fn reset(self: *Evaluator) void {
+        self.scope.reset();
+    }
+
     pub fn init(allocator: std.mem.Allocator, vtable: EvaluatorVtable) Evaluator {
         return Evaluator{
             .allocator = allocator,

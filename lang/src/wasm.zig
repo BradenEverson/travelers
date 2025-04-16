@@ -66,6 +66,7 @@ export fn loadProgram(prog: [*]u8, len: usize) i32 {
 }
 
 fn loadProgramInner(prog: [*]u8, len: usize) !void {
+    runtime.reset();
     instructions.clearAndFree();
     while (move_queue.pop()) |_| {}
 

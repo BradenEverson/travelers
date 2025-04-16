@@ -12,8 +12,18 @@ pub const OwnedScope = struct {
         };
     }
 
+    /// Gets a Literal from an identifier
     pub fn get(self: *OwnedScope, key: []const u8) ?Literal {
         return self.map.get(key);
+    }
+
+    /// Removes and frees all values
+    pub fn reset(self: *OwnedScope) void {
+        var iter = self.map.keyIterator();
+        while (iter.next()) |key| {
+            _ = self.map.remove(key.*);
+            self.allocator.free(key.*);
+        }
     }
 
     /// Registers an unowned name into a scoped variable and assigns it to the value
