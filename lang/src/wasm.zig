@@ -20,7 +20,7 @@ var pc: usize = 0;
 var instructions = std.ArrayList(*Expression).init(allocator);
 
 var parser = Parser.init(null, allocator);
-var runtime = Evaluator.init(allocator, .{ .move_fn = enqueue_move, .print_fn = null });
+var runtime = Evaluator.init(allocator, .{ .move_fn = enqueueMove, .print_fn = null });
 
 const Move = struct {
     dir: Direction,
@@ -29,7 +29,7 @@ const Move = struct {
 const MoveQueue = std.DoublyLinkedList(Move);
 var move_queue = MoveQueue{};
 
-fn enqueue_move(dir: Direction, amount: usize) void {
+fn enqueueMove(dir: Direction, amount: usize) void {
     for (0..amount) |_| {
         const mv = Move{ .dir = dir };
 
