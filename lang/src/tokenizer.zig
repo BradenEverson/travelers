@@ -47,11 +47,7 @@ pub const Keyword = enum {
         .{ "up", .up },
         .{ "down", .down },
         .{ "move", .move },
-        .{ "l", .left },
-        .{ "r", .right },
-        .{ "u", .up },
-        .{ "d", .down },
-        .{ "mv", .move },
+
         .{ "if", .if_key },
         .{ "else", .else_key },
 
