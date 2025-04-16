@@ -154,5 +154,5 @@ WebAssembly.instantiateStreaming(fetch("wasm/traveler_wasm.wasm"), importObject)
 
     setInterval(() => {
         result.instance.exports.step();
-    }, 100);
+    }, 50);
 });

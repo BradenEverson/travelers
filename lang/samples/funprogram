@@ -1,0 +1,15 @@
+while (true) {
+  let x = 1;
+  let y = 1;
+
+  while (x < 32) {
+    move right 1;
+    move down 1;
+
+    let x = x + 1;
+    let y = y + 1;
+  }
+
+  move up 31;
+  move left 31;
+}
