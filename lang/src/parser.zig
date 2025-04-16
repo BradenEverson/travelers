@@ -204,7 +204,7 @@ pub const Parser = struct {
                 const op: BinaryOp = switch (key) {
                     .and_key => .and_op,
                     .or_key => .or_op,
-                    else => return error.UnexpectedKeyword,
+                    else => break :grow,
                 };
                 self.advance();
 
