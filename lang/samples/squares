@@ -1,0 +1,44 @@
+while (true) {
+  let x = 1;
+  let y = 32;
+
+  let tx = 32;
+  let ty = 1;
+
+  let bx = 1;
+  let by = 32;
+
+  let c = 16;
+
+  while (c != 0) {
+    while (x < tx) {
+      move right 1;
+      let x = x + 1;
+    }
+
+    while (y > ty) {
+      move down 1;
+      let y = y - 1;
+    }
+
+    while (x > bx) {
+      move left 1;
+      let x = x - 1;
+    }
+
+    while (y < by - 1) {
+      move up 1;
+      let y = y + 1;
+    }
+
+    let tx = tx - 1;
+    let ty = ty + 1;
+    let bx = bx + 1;
+    let by = by - 1;
+
+    let c = c - 1;
+  }
+
+  move up 16;
+  move left 15;
+}
