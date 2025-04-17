@@ -13,6 +13,7 @@ const Evaluator = @import("./evaluator.zig").Evaluator;
 
 pub extern "env" fn updatePosition(x: u32, y: u32) void;
 pub extern "env" fn moveRelative(dx: i32, dy: i32) void;
+pub extern "env" fn lookAtRelative(dx: i32, dy: i32) i32;
 
 const allocator = std.heap.wasm_allocator;
 

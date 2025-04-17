@@ -99,8 +99,6 @@ function handleResize() {
 handleResize();
 window.addEventListener("resize", handleResize);
 
-
-
 let importObject = {
     env: {
         updatePosition: (new_x, new_y) => {
@@ -113,6 +111,8 @@ let importObject = {
             y += dy;
             drawGrid();
         },
+
+        lookAtRelative: (dx, dy) => {},
 
         log_js: (ptr, len) => {
             const buffer = new Uint8Array(memory.buffer, ptr, len);
