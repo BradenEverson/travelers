@@ -50,6 +50,8 @@ editor.on('inputRead', (cm, input) => {
 let x = 0;
 let y = 0;
 
+let health = 100;
+
 var grid = {x:32, y:32}
 
 let canvas = document.getElementById("grid");
