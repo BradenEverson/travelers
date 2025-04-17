@@ -8,7 +8,7 @@ editor = CodeMirror.fromTextArea(document.getElementById('code'), {
     mode: {
         name: "javascript",
         extraKeywords: customKeywords.join(" ")
-    },
+},
     theme: "dracula",
     lineNumbers: true,
     tabSize: 2,
@@ -113,6 +113,8 @@ let importObject = {
             y += dy;
             drawGrid();
         },
+
+        attackAt: (dir) => {},
 
         lookAtRelative: (dx, dy) => {},
 
