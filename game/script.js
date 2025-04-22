@@ -174,6 +174,13 @@ let importObject = {
             drawGrid();
         }, 
         moveRelative: (dx, dy) => {
+            if (x == 0 && dx < 0 
+                || y == 0 && dy < 0 
+                || x == grid.x - 1 && dx > 0 
+                || y == grid.y - 1 && dy > 0) 
+            {
+                return;
+            }
             x += dx;
             y += dy;
             drawGrid();
