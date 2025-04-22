@@ -79,6 +79,24 @@ pub const Parser = struct {
         }
     }
 
+    fn attack(self: *Parser, expr: *Expression) ParserError!void {
+        self.advance();
+        const tag = self.peek().?;
+        switch (tag) {
+            .keyword => |key| {
+                switch (key) {
+                    .up, .down, .left, .right => {
+                        self.advance();
+                        const dir = direction_from_keyword(key) orelse unreachable;
+                        expr.* = .{ .attack = dir };
+                    },
+                    else => return error.UnexpectedKeyword,
+                }
+            },
+            else => return error.ExpectedTokenFound,
+        }
+    }
+
     fn peek_statement(self: *Parser, expr: *Expression) ParserError!void {
         self.advance();
         const tag = self.peek().?;
@@ -412,6 +430,12 @@ pub const Parser = struct {
                     try self.peek_statement(peek_expr);
 
                     break :val peek_expr;
+                },
+                .attack => {
+                    const atk = try self.allocator().create(Expression);
+                    try self.attack(atk);
+
+                    break :val atk;
                 },
                 .true_key => {
                     self.advance();
