@@ -29,6 +29,7 @@ pub const WhileLoop = struct {
 pub const Expression = union(enum) {
     move: struct { Direction, ?*const Expression },
     peek: Direction,
+    attack: Direction,
 
     block: []*const Expression,
 
@@ -55,6 +56,10 @@ pub const Expression = union(enum) {
         switch (self.*) {
             .peek => |d| {
                 try writer.print("peek {}", .{d});
+            },
+
+            .attack => |d| {
+                try writer.print("attack {}", .{d});
             },
 
             .assignment => |a| {

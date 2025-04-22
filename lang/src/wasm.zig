@@ -35,7 +35,7 @@ export fn doDamage(dmg: u8) void {
 }
 
 var parser = Parser.init(null, allocator);
-var runtime = Evaluator.init(allocator, .{ .move_fn = enqueueMove, .print_fn = null, .block_fn = blockStatement, .while_fn = whileStatement, .peek_fn = peekAt });
+var runtime = Evaluator.init(allocator, .{ .move_fn = enqueueMove, .print_fn = null, .block_fn = blockStatement, .while_fn = whileStatement, .peek_fn = peekAt, .attack_fn = attack });
 
 const Action = union(enum) {
     move: Direction,
@@ -43,6 +43,12 @@ const Action = union(enum) {
 
 const MoveQueue = std.DoublyLinkedList(Action);
 var move_queue = MoveQueue{};
+
+fn attack(dir: Direction) f32 {
+    // Todo!
+    _ = dir;
+    return 1.0;
+}
 
 fn peekAt(dir: Direction) TileType {
     const peek = switch (dir) {

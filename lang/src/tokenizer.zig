@@ -37,6 +37,7 @@ pub const Keyword = enum {
     down,
     move,
     peek,
+    attack,
     if_key,
     else_key,
     for_key,
@@ -62,6 +63,7 @@ pub const Keyword = enum {
         .{ "down", .down },
         .{ "move", .move },
         .{ "peek", .peek },
+        .{ "attack", .attack },
 
         .{ "stone", .stone },
         .{ "wood", .wood },
@@ -89,6 +91,7 @@ pub const Keyword = enum {
             .down => try writer.print("down", .{}),
             .move => try writer.print("move", .{}),
             .peek => try writer.print("peek", .{}),
+            .attack => try writer.print("attack", .{}),
 
             .stone => try writer.print("stone", .{}),
             .wood => try writer.print("wood", .{}),

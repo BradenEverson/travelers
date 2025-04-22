@@ -19,6 +19,7 @@ pub const EvaluatorVtable = struct {
     block_fn: ?*const fn ([]*const Expression) void,
     while_fn: *const fn (*const Expression) void,
     peek_fn: *const fn (Direction) TileType,
+    attack_fn: *const fn (Direction) f32,
 };
 
 pub const Evaluator = struct {
@@ -42,8 +43,12 @@ pub const Evaluator = struct {
         switch (ast.*) {
             .peek => |direction| {
                 const tt = self.vtable.peek_fn(direction);
-                console.log("Looking at {} {}", .{ tt, direction });
                 return .{ .tile = tt };
+            },
+
+            .attack => |direction| {
+                const dmg = self.vtable.attack_fn(direction);
+                return .{ .number = dmg };
             },
 
             .move => |moveinfo| {
