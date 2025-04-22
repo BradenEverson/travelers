@@ -9,6 +9,10 @@ const expression = @import("./parser/expression.zig");
 const Expression = expression.Expression;
 const Direction = expression.Direction;
 
+const game = @import("game_std.zig");
+const Unit = game.Unit;
+const TileTypes = game.Unit;
+
 const Evaluator = @import("./evaluator.zig").Evaluator;
 
 pub extern "env" fn updatePosition(x: u32, y: u32) void;
@@ -20,6 +24,11 @@ const allocator = std.heap.wasm_allocator;
 
 var pc: usize = 0;
 var instructions = std.ArrayList(*const Expression).init(allocator);
+var player = Unit.default();
+
+export fn doDamage(dmg: u8) void {
+    player.health -|= dmg;
+}
 
 var parser = Parser.init(null, allocator);
 var runtime = Evaluator.init(allocator, .{ .move_fn = enqueueMove, .print_fn = null, .block_fn = blockStatement, .while_fn = whileStatement });
