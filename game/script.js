@@ -194,7 +194,10 @@ let importObject = {
             drawGrid();
         },
 
-        attackAt: (dir) => {},
+        attackAt: (dir) => {
+            // todo
+            return -1.0;
+        },
 
         lookAtRelative: (dx, dy) => {
             const nx = x + dx;

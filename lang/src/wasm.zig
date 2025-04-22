@@ -18,7 +18,7 @@ const Evaluator = @import("./evaluator.zig").Evaluator;
 pub extern "env" fn updatePosition(x: u32, y: u32) void;
 pub extern "env" fn moveRelative(dx: i32, dy: i32) void;
 pub extern "env" fn lookAtRelative(dx: i32, dy: i32) i32;
-pub extern "env" fn attackAt(dir: i32) void;
+pub extern "env" fn attackAt(dx: i32, dy: i32) f32;
 
 pub fn lookAt(dx: i32, dy: i32) TileType {
     return TileType.from_int(lookAtRelative(dx, dy)) orelse .open;
@@ -45,9 +45,14 @@ const MoveQueue = std.DoublyLinkedList(Action);
 var move_queue = MoveQueue{};
 
 fn attack(dir: Direction) f32 {
-    // Todo!
-    _ = dir;
-    return 1.0;
+    const dmg = switch (dir) {
+        .up => attackAt(0, -1),
+        .down => attackAt(0, 1),
+        .left => attackAt(-1, 0),
+        .right => attackAt(1, 0),
+    };
+
+    return dmg;
 }
 
 fn peekAt(dir: Direction) TileType {
