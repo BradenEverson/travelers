@@ -3,6 +3,7 @@ const std = @import("std");
 const Literal = @import("./parser/expression.zig").Literal;
 const Direction = @import("./parser/expression.zig").Direction;
 const OwnedScope = @import("./evaluator/scope.zig").OwnedScope;
+const TileType = @import("game_std.zig").TileType;
 
 pub const RuntimeError = error{
     WrongLiteralType,
@@ -16,6 +17,7 @@ pub const EvaluatorVtable = struct {
     print_fn: ?*const fn (Literal) void,
     block_fn: ?*const fn ([]*const Expression) void,
     while_fn: *const fn (*const Expression) void,
+    peek_fn: *const fn (Direction) TileType,
 };
 
 pub const Evaluator = struct {
@@ -37,6 +39,11 @@ pub const Evaluator = struct {
 
     pub fn eval(self: *Evaluator, ast: *const Expression) EvaluatorError!Literal {
         switch (ast.*) {
+            .peek => |direction| {
+                const tt = self.vtable.peek_fn(direction);
+                return .{ .tile = tt };
+            },
+
             .move => |moveinfo| {
                 const mag = if (moveinfo.@"1") |magnitude|
                     try (try self.eval(magnitude)).numeric()

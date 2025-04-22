@@ -1,3 +1,5 @@
+const std = @import("std");
+
 pub const TileType = enum {
     open,
     enemy,
@@ -12,6 +14,20 @@ pub const TileType = enum {
             3 => .wood,
             else => null,
         };
+    }
+
+    pub fn format(
+        self: *const TileType,
+        _: []const u8,
+        _: std.fmt.FormatOptions,
+        writer: anytype,
+    ) !void {
+        switch (self.*) {
+            .open => try writer.print("open", .{}),
+            .enemy => try writer.print("enemy", .{}),
+            .rock => try writer.print("rock", .{}),
+            .wood => try writer.print("wood", .{}),
+        }
     }
 };
 

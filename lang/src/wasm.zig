@@ -21,7 +21,7 @@ pub extern "env" fn lookAtRelative(dx: i32, dy: i32) i32;
 pub extern "env" fn attackAt(dir: i32) void;
 
 pub fn lookAt(dx: i32, dy: i32) TileType {
-    return TileType.from_int(lookAtRelative(dx, dy)) catch .open;
+    return TileType.from_int(lookAtRelative(dx, dy)) orelse .open;
 }
 
 const allocator = std.heap.wasm_allocator;
@@ -35,7 +35,7 @@ export fn doDamage(dmg: u8) void {
 }
 
 var parser = Parser.init(null, allocator);
-var runtime = Evaluator.init(allocator, .{ .move_fn = enqueueMove, .print_fn = null, .block_fn = blockStatement, .while_fn = whileStatement });
+var runtime = Evaluator.init(allocator, .{ .move_fn = enqueueMove, .print_fn = null, .block_fn = blockStatement, .while_fn = whileStatement, .peek_fn = peekAt });
 
 const Action = union(enum) {
     move: Direction,
@@ -43,6 +43,17 @@ const Action = union(enum) {
 
 const MoveQueue = std.DoublyLinkedList(Action);
 var move_queue = MoveQueue{};
+
+fn peekAt(dir: Direction) TileType {
+    const peek = switch (dir) {
+        .up => lookAt(0, -1),
+        .down => lookAt(0, 1),
+        .left => lookAt(-1, 0),
+        .right => lookAt(1, 0),
+    };
+
+    return peek;
+}
 
 fn enqueueMove(dir: Direction, amount: usize) void {
     for (0..amount) |_| {

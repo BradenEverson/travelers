@@ -1,6 +1,7 @@
 const std = @import("std");
 const RuntimeError = @import("../evaluator.zig").RuntimeError;
 const Keyword = @import("../tokenizer.zig").Keyword;
+const TileType = @import("../game_std.zig").TileType;
 
 pub const Direction = enum {
     left,
@@ -27,6 +28,7 @@ pub const WhileLoop = struct {
 
 pub const Expression = union(enum) {
     move: struct { Direction, ?*const Expression },
+    peek: Direction,
 
     block: []*const Expression,
 
@@ -51,6 +53,10 @@ pub const Expression = union(enum) {
         writer: anytype,
     ) !void {
         switch (self.*) {
+            .peek => |d| {
+                try writer.print("peek {}", .{d});
+            },
+
             .assignment => |a| {
                 try writer.print("let {s} = {};", .{ a.name, a.eval_to });
             },
@@ -120,6 +126,7 @@ pub const Literal = union(enum) {
     number: f32,
     boolean: bool,
     void,
+    tile: TileType,
 
     pub fn eql(self: *const Literal, other: Literal) bool {
         // Might become more complex in the future if we encorporate strings, that's why it's its own fn
@@ -158,6 +165,10 @@ pub const Literal = union(enum) {
 
             .void => {
                 try writer.print("void", .{});
+            },
+
+            .tile => |tt| {
+                try writer.print("{}", .{tt});
             },
         }
     }
