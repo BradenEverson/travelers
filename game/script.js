@@ -4,7 +4,7 @@ let memory = new WebAssembly.Memory({
 
 const customKeywords = ["move", "left", "right", "up", "down", "if", "else", "let", "while", "for", "true", "false", "and", "or"];
 
-editor = CodeMirror.fromTextArea(document.getElementById('code'), {
+editor = CodeMirror.fromTextArea(document.getElementById("code"), {
     mode: {
         name: "javascript",
         extraKeywords: customKeywords.join(" ")
@@ -25,7 +25,7 @@ editor = CodeMirror.fromTextArea(document.getElementById('code'), {
     gutters: ["CodeMirror-linenumbers"]
 });
 
-editor.on('inputRead', (cm, input) => {
+editor.on("inputRead", (cm, input) => {
     if (input.text && input.text[0].trim()) {
         CodeMirror.commands.autocomplete(cm, null, {
             completeSingle: false,
@@ -129,15 +129,15 @@ async function drawGrid() {
     }
 }
 
-document.querySelectorAll('.tile-btn').forEach(button => {
-    button.addEventListener('click', function() {
-        document.querySelectorAll('.tile-btn').forEach(btn => btn.classList.remove('active'));
-        this.classList.add('active');
+document.querySelectorAll(".tile-btn").forEach(button => {
+    button.addEventListener("click", function() {
+        document.querySelectorAll(".tile-btn").forEach(btn => btn.classList.remove("active"));
+        this.classList.add("active");
         selectedType = parseInt(this.dataset.type);
     });
 });
 
-canvas.addEventListener('click', (event) => {
+canvas.addEventListener("click", (event) => {
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
