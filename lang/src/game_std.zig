@@ -1,8 +1,18 @@
-pub const TileTypes = enum {
+pub const TileType = enum {
     open,
     enemy,
     rock,
     wood,
+
+    pub fn from_int(from: i32) ?TileType {
+        return switch (from) {
+            0 => .open,
+            1 => .enemy,
+            2 => .rock,
+            3 => .wood,
+            else => null,
+        };
+    }
 };
 
 pub const Unit = struct {

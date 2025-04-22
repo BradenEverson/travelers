@@ -11,7 +11,7 @@ const Direction = expression.Direction;
 
 const game = @import("game_std.zig");
 const Unit = game.Unit;
-const TileTypes = game.Unit;
+const TileType = game.TileType;
 
 const Evaluator = @import("./evaluator.zig").Evaluator;
 
@@ -19,6 +19,10 @@ pub extern "env" fn updatePosition(x: u32, y: u32) void;
 pub extern "env" fn moveRelative(dx: i32, dy: i32) void;
 pub extern "env" fn lookAtRelative(dx: i32, dy: i32) i32;
 pub extern "env" fn attackAt(dir: i32) void;
+
+pub fn lookAt(dx: i32, dy: i32) TileType {
+    TileType.from_int(lookAtRelative(dx, dy)) catch unreachable;
+}
 
 const allocator = std.heap.wasm_allocator;
 
