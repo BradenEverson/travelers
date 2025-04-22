@@ -2,7 +2,7 @@ let memory = new WebAssembly.Memory({
     initial: 2,
 });
 
-const customKeywords = ["move", "left", "right", "up", "down", "if", "else", "let", "while", "for", "true", "false", "and", "or"];
+const customKeywords = ["move", "left", "right", "up", "down", "if", "else", "let", "while", "for", "true", "false", "and", "or", "peek"];
 
 editor = CodeMirror.fromTextArea(document.getElementById("code"), {
     mode: {
