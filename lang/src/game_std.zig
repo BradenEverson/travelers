@@ -3,14 +3,14 @@ const std = @import("std");
 pub const TileType = enum {
     open,
     enemy,
-    rock,
+    stone,
     wood,
 
     pub fn from_int(from: i32) ?TileType {
         return switch (from) {
             0 => .open,
             1 => .enemy,
-            2 => .rock,
+            2 => .stone,
             3 => .wood,
             else => null,
         };
@@ -25,7 +25,7 @@ pub const TileType = enum {
         switch (self.*) {
             .open => try writer.print("open", .{}),
             .enemy => try writer.print("enemy", .{}),
-            .rock => try writer.print("rock", .{}),
+            .stone => try writer.print("stone", .{}),
             .wood => try writer.print("wood", .{}),
         }
     }

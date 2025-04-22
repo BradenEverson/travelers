@@ -79,6 +79,25 @@ pub const Parser = struct {
         }
     }
 
+    // need to rework this, should eval to a literal not a statement
+    fn peek_statement(self: *Parser, expr: *Expression) ParserError!void {
+        self.advance();
+        const tag = self.peek().?;
+        switch (tag) {
+            .keyword => |key| {
+                switch (key) {
+                    .up, .down, .left, .right => {
+                        self.advance();
+                        const dir = direction_from_keyword(key) orelse unreachable;
+                        expr.* = .{ .peek = dir };
+                    },
+                    else => return error.UnexpectedKeyword,
+                }
+            },
+            else => return error.ExpectedTokenFound,
+        }
+    }
+
     fn move_statement(self: *Parser, expr: *Expression) ParserError!void {
         self.advance();
         const tag = self.peek().?;
@@ -155,6 +174,7 @@ pub const Parser = struct {
                 switch (key) {
                     .let => try self.assignment_statement(new_expr),
                     .move => try self.move_statement(new_expr),
+                    .peek => try self.peek_statement(new_expr),
                     .if_key => try self.if_statement(new_expr),
                     .while_key => try self.while_loop(new_expr),
                     else => {
@@ -403,6 +423,39 @@ pub const Parser = struct {
 
                     break :val boolean;
                 },
+
+                .stone => {
+                    self.advance();
+                    const tile = try self.allocator().create(Expression);
+                    tile.* = .{ .literal = .{ .tile = .stone } };
+
+                    break :val tile;
+                },
+
+                .open => {
+                    self.advance();
+                    const tile = try self.allocator().create(Expression);
+                    tile.* = .{ .literal = .{ .tile = .open } };
+
+                    break :val tile;
+                },
+
+                .wood => {
+                    self.advance();
+                    const tile = try self.allocator().create(Expression);
+                    tile.* = .{ .literal = .{ .tile = .wood } };
+
+                    break :val tile;
+                },
+
+                .enemy => {
+                    self.advance();
+                    const tile = try self.allocator().create(Expression);
+                    tile.* = .{ .literal = .{ .tile = .enemy } };
+
+                    break :val tile;
+                },
+
                 else => return error.UnexpectedKeyword,
             },
             .number => |n| {
