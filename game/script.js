@@ -181,8 +181,16 @@ let importObject = {
             {
                 return;
             }
-            x += dx;
-            y += dy;
+
+            const nx = x + dx;
+            const ny = y + dy;
+
+            if (tile_types[ny][nx] != OPEN) {
+                return;
+            }
+
+            x = nx;
+            y = ny;
             drawGrid();
         },
 
