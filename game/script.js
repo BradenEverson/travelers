@@ -196,7 +196,16 @@ let importObject = {
 
         attackAt: (dir) => {},
 
-        lookAtRelative: (dx, dy) => {},
+        lookAtRelative: (dx, dy) => {
+            const nx = x + dx;
+            const ny = y + dy;
+            
+            if (nx < 0 || nx >= grid.x || ny < 0 || ny >= grid.y) {
+                return -1;
+            } else {
+                return tile_types[x + dx][y + dy];
+            }
+        },
 
         log_js: (ptr, len) => {
             const buffer = new Uint8Array(memory.buffer, ptr, len);

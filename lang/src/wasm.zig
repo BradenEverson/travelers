@@ -21,7 +21,7 @@ pub extern "env" fn lookAtRelative(dx: i32, dy: i32) i32;
 pub extern "env" fn attackAt(dir: i32) void;
 
 pub fn lookAt(dx: i32, dy: i32) TileType {
-    TileType.from_int(lookAtRelative(dx, dy)) catch unreachable;
+    return TileType.from_int(lookAtRelative(dx, dy)) catch .open;
 }
 
 const allocator = std.heap.wasm_allocator;
