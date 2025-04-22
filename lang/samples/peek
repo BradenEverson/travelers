@@ -1,1 +1,11 @@
-peek up;
+move down 31;
+
+while (peek right != stone) {
+  move up 1;
+} 
+
+move down 1;
+
+while (peek down != enemy) {
+  move right 1; 
+}

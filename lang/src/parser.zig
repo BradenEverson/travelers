@@ -79,7 +79,6 @@ pub const Parser = struct {
         }
     }
 
-    // need to rework this, should eval to a literal not a statement
     fn peek_statement(self: *Parser, expr: *Expression) ParserError!void {
         self.advance();
         const tag = self.peek().?;
@@ -174,7 +173,6 @@ pub const Parser = struct {
                 switch (key) {
                     .let => try self.assignment_statement(new_expr),
                     .move => try self.move_statement(new_expr),
-                    .peek => try self.peek_statement(new_expr),
                     .if_key => try self.if_statement(new_expr),
                     .while_key => try self.while_loop(new_expr),
                     else => {
@@ -409,6 +407,12 @@ pub const Parser = struct {
                 break :val v;
             },
             .keyword => |k| switch (k) {
+                .peek => {
+                    const peek_expr = try self.allocator().create(Expression);
+                    try self.peek_statement(peek_expr);
+
+                    break :val peek_expr;
+                },
                 .true_key => {
                     self.advance();
                     const boolean = try self.allocator().create(Expression);
