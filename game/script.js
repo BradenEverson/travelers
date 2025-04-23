@@ -58,7 +58,6 @@ function resetStorm() {
     stormTicks = 0;
 }
 
-
 // Tile Types
 const OPEN = 0;
 const ENEMY = 1;
@@ -83,6 +82,11 @@ var tile_types = create2DArray(grid.y, grid.x);
 let canvas = document.getElementById("grid");
 let ctx = canvas.getContext("2d");
 
+function inStorm(lx, ly) {
+    return lx < stormLevel || lx >= grid.x - stormLevel
+        || ly < stormLevel || ly >= grid.y - stormLevel;
+
+}
 
 async function drawGrid() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -97,9 +101,7 @@ async function drawGrid() {
             } 
             const type = tile_types[ly][lx];
             let color;
-            if (lx < stormLevel || lx >= grid.x - stormLevel
-                || ly < stormLevel || ly >= grid.y - stormLevel
-            ) {
+            if (inStorm(lx, ly)) {
                 color = "#676bc2";
             } else {
                 switch(type) {
@@ -249,7 +251,7 @@ WebAssembly.instantiateStreaming(fetch("wasm/traveler_wasm.wasm"), importObject)
     function tickStorm() {
         stormTicks += 1;
 
-        if (stormTicks % 4 == 0) {
+        if (stormTicks % 4 == 0 && inStorm(x, y)) {
             result.instance.exports.doDamage(1);
         }
 
