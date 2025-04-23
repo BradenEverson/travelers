@@ -4,7 +4,6 @@ const Literal = @import("./parser/expression.zig").Literal;
 const Direction = @import("./parser/expression.zig").Direction;
 const OwnedScope = @import("./evaluator/scope.zig").OwnedScope;
 const TileType = @import("game_std.zig").TileType;
-const console = @import("wasm/core.zig");
 
 pub const RuntimeError = error{
     WrongLiteralType,

@@ -131,7 +131,6 @@ fn loadProgramInner(prog: [*]u8, len: usize) !void {
     var stream_buf = std.ArrayList(tokenizer.Token).init(allocator);
 
     const stream = prog[0..len];
-    console.log("'{s}'\n", .{stream});
 
     try tokenizer.tokenize(stream, &stream_buf, null);
 

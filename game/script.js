@@ -254,7 +254,6 @@ WebAssembly.instantiateStreaming(fetch("wasm/traveler_wasm.wasm"), importObject)
         }
 
         if (stormTicks % 1000 == 0) {
-            console.log("storm growing");
             stormLevel += 1;
         }
     }
@@ -269,7 +268,6 @@ WebAssembly.instantiateStreaming(fetch("wasm/traveler_wasm.wasm"), importObject)
         const code = editor.getValue();
         const [ptr, len] = stringToPtr(code);
         const res = result.instance.exports.loadProgram(ptr, len);
-        console.log(res);
 
         resetStorm();
 
