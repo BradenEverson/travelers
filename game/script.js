@@ -209,9 +209,16 @@ let importObject = {
             y = ny;
         },
 
-        attackAt: (dir) => {
-            // todo
-            return -1.0;
+        attackAt: (dx, dy) => {
+            const nx = x + dx;
+            const ny = y + dy;
+            
+            if(tile_types[ny][nx] == WOOD) {
+                tile_types[ny][nx] = OPEN;
+                return 1.0;
+            }
+
+            return 0.0;
         },
 
         lookAtRelative: (dx, dy) => {

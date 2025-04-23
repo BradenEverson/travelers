@@ -32,6 +32,7 @@ var player = Unit.default();
 
 export fn doDamage(dmg: u8) void {
     player.health -|= dmg;
+    console.log("{}", .{player.health});
 }
 
 var parser = Parser.init(null, allocator);
