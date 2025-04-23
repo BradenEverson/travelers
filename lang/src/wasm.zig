@@ -8,6 +8,7 @@ const Parser = @import("./parser.zig").Parser;
 const expression = @import("./parser/expression.zig");
 const Expression = expression.Expression;
 const Direction = expression.Direction;
+const Literal = expression.Literal;
 
 const game = @import("game_std.zig");
 const Unit = game.Unit;
@@ -19,6 +20,10 @@ pub extern "env" fn updatePosition(x: u32, y: u32) void;
 pub extern "env" fn moveRelative(dx: i32, dy: i32) void;
 pub extern "env" fn lookAtRelative(dx: i32, dy: i32) i32;
 pub extern "env" fn attackAt(dx: i32, dy: i32) f32;
+
+pub fn print(l: Literal) void {
+    console.log("{}", .{l});
+}
 
 pub fn lookAt(dx: i32, dy: i32) TileType {
     return TileType.from_int(lookAtRelative(dx, dy)) orelse .open;
@@ -36,7 +41,7 @@ export fn doDamage(dmg: u8) void {
 }
 
 var parser = Parser.init(null, allocator);
-var runtime = Evaluator.init(allocator, .{ .move_fn = enqueueMove, .print_fn = null, .block_fn = blockStatement, .while_fn = whileStatement, .peek_fn = peekAt, .attack_fn = attack });
+var runtime = Evaluator.init(allocator, .{ .move_fn = enqueueMove, .print_fn = print, .block_fn = blockStatement, .while_fn = whileStatement, .peek_fn = peekAt, .attack_fn = attack });
 
 const Action = union(enum) {
     move: Direction,
