@@ -50,6 +50,15 @@ editor.on("inputRead", (cm, input) => {
 let x = 0;
 let y = 0;
 
+let stormLevel = 0;
+let stormTicks = 0;
+
+function resetStorm() {
+    stormLevel = 0;
+    stormTicks = 0;
+}
+
+
 // Tile Types
 const OPEN = 0;
 const ENEMY = 1;
@@ -85,15 +94,21 @@ async function drawGrid() {
         for (let lx = 0; lx < grid.x; lx++) {
             if (x == lx && y == ly) {
                 continue;
-            }
+            } 
             const type = tile_types[ly][lx];
             let color;
-            switch(type) {
-                case OPEN: color = "#4ade80"; break;
-                case ENEMY: color = "#9333ea"; break;
-                case ROCK: color = "#6b7280"; break;
-                case WOOD: color = "#854d0e"; break;
-                default: color = "#000000";
+            if (lx < stormLevel || lx >= grid.x - stormLevel
+                || ly < stormLevel || ly >= grid.y - stormLevel
+            ) {
+                color = "#676bc2";
+            } else {
+                switch(type) {
+                    case OPEN: color = "#4ade80"; break;
+                    case ENEMY: color = "#9333ea"; break;
+                    case ROCK: color = "#6b7280"; break;
+                    case WOOD: color = "#854d0e"; break;
+                    default: color = "#000000";
+                }
             }
             ctx.fillStyle = color;
             ctx.fillRect(lx * cellWidth, ly * cellHeight, cellWidth, cellHeight);
@@ -171,7 +186,6 @@ let importObject = {
         updatePosition: (new_x, new_y) => {
             x = new_x;
             y = new_y;
-            drawGrid();
         }, 
         moveRelative: (dx, dy) => {
             if (x == 0 && dx < 0 
@@ -191,7 +205,6 @@ let importObject = {
 
             x = nx;
             y = ny;
-            drawGrid();
         },
 
         attackAt: (dir) => {
@@ -233,6 +246,19 @@ WebAssembly.instantiateStreaming(fetch("wasm/traveler_wasm.wasm"), importObject)
         return [ptr, encoded.length];
     }
 
+    function tickStorm() {
+        stormTicks += 1;
+
+        if (stormTicks % 4 == 0) {
+            result.instance.exports.doDamage(1);
+        }
+
+        if (stormTicks % 1000 == 0) {
+            console.log("storm growing");
+            stormLevel += 1;
+        }
+    }
+
     
     document.getElementById("run").addEventListener("click", () => {
         if (!result.instance) {
@@ -244,9 +270,14 @@ WebAssembly.instantiateStreaming(fetch("wasm/traveler_wasm.wasm"), importObject)
         const [ptr, len] = stringToPtr(code);
         const res = result.instance.exports.loadProgram(ptr, len);
         console.log(res);
-    });
 
-    setInterval(() => {
-        result.instance.exports.step();
-    }, 50);
+        resetStorm();
+
+        setInterval(() => {
+            tickStorm();
+            drawGrid();
+            result.instance.exports.step();
+        }, 50);
+    });
 });
+
