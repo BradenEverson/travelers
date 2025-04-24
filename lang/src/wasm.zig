@@ -26,7 +26,7 @@ pub fn print(l: Literal) void {
 }
 
 pub fn lookAt(dx: i32, dy: i32) TileType {
-    return TileType.from_int(lookAtRelative(dx, dy)) orelse .open;
+    return TileType.from_int(lookAtRelative(dx, dy)) orelse .border;
 }
 
 const allocator = std.heap.wasm_allocator;

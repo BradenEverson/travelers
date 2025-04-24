@@ -476,6 +476,14 @@ pub const Parser = struct {
                     break :val tile;
                 },
 
+                .border => {
+                    self.advance();
+                    const tile = try self.allocator().create(Expression);
+                    tile.* = .{ .literal = .{ .tile = .border } };
+
+                    break :val tile;
+                },
+
                 .enemy => {
                     self.advance();
                     const tile = try self.allocator().create(Expression);

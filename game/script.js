@@ -23,6 +23,7 @@ const customKeywords = [
   "wood",
   "open",
   "enemy",
+  "border",
 ];
 
 editor = CodeMirror.fromTextArea(document.getElementById("code"), {
@@ -250,7 +251,12 @@ let importObject = {
 
       if (tile_types[ny][nx] == WOOD) {
         tile_types[ny][nx] = OPEN;
-        return 1.0;
+        return WOOD;
+      } else if (tile_types[ny][nx] == ENEMY) {
+        // TODO: Bounce enemy backwards until they hit something
+        tile_types[ny][nx] = OPEN;
+        tile_types[ny + dy][nx + dx] = ENEMY;
+        return ENEMY;
       }
 
       return 0.0;
@@ -296,11 +302,11 @@ WebAssembly.instantiateStreaming(
   function tickStorm() {
     stormTicks += 1;
 
-    if (stormTicks % 4 == 0 && inStorm(x, y)) {
+    if (stormTicks % 8 == 0 && inStorm(x, y)) {
       result.instance.exports.doDamage(1);
     }
 
-    if (stormTicks % 1000 == 0) {
+    if (stormTicks % 2000 == 0) {
       stormLevel += 1;
     }
   }
@@ -321,6 +327,6 @@ WebAssembly.instantiateStreaming(
       tickStorm();
       drawGrid();
       result.instance.exports.step();
-    }, 50);
+    }, 25);
   });
 });
