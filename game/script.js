@@ -24,6 +24,7 @@ const customKeywords = [
   "open",
   "enemy",
   "border",
+  "storm",
 ];
 
 editor = CodeMirror.fromTextArea(document.getElementById("code"), {

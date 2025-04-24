@@ -47,6 +47,7 @@ pub const Keyword = enum {
     enemy,
     open,
     border,
+    storm,
 
     let,
 
@@ -71,6 +72,7 @@ pub const Keyword = enum {
         .{ "enemy", .enemy },
         .{ "open", .open },
         .{ "border", .border },
+        .{ "storm", .storm },
 
         .{ "if", .if_key },
         .{ "else", .else_key },
@@ -100,6 +102,7 @@ pub const Keyword = enum {
             .enemy => try writer.print("enemy", .{}),
             .open => try writer.print("open", .{}),
             .border => try writer.print("border", .{}),
+            .storm => try writer.print("storm", .{}),
 
             .if_key => try writer.print("if", .{}),
             .else_key => try writer.print("else", .{}),
