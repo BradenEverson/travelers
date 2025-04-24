@@ -18,7 +18,7 @@ pub const EvaluatorVtable = struct {
     block_fn: ?*const fn ([]*const Expression) void,
     while_fn: *const fn (*const Expression) void,
     peek_fn: *const fn (Direction) TileType,
-    attack_fn: *const fn (Direction) f32,
+    attack_fn: *const fn (Direction) TileType,
 };
 
 pub const Evaluator = struct {
@@ -46,8 +46,8 @@ pub const Evaluator = struct {
             },
 
             .attack => |direction| {
-                const dmg = self.vtable.attack_fn(direction);
-                return .{ .number = dmg };
+                const tile = self.vtable.attack_fn(direction);
+                return .{ .tile = tile };
             },
 
             .move => |moveinfo| {

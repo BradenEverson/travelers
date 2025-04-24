@@ -19,7 +19,7 @@ const Evaluator = @import("./evaluator.zig").Evaluator;
 pub extern "env" fn updatePosition(x: u32, y: u32) void;
 pub extern "env" fn moveRelative(dx: i32, dy: i32) void;
 pub extern "env" fn lookAtRelative(dx: i32, dy: i32) i32;
-pub extern "env" fn attackAt(dx: i32, dy: i32) f32;
+pub extern "env" fn attackAt(dx: i32, dy: i32) i32;
 
 pub fn print(l: Literal) void {
     console.log("{}", .{l});
@@ -50,15 +50,21 @@ const Action = union(enum) {
 const MoveQueue = std.DoublyLinkedList(Action);
 var move_queue = MoveQueue{};
 
-fn attack(dir: Direction) f32 {
-    const dmg = switch (dir) {
+fn attack(dir: Direction) TileType {
+    const attacked = switch (dir) {
         .up => attackAt(0, -1),
         .down => attackAt(0, 1),
         .left => attackAt(-1, 0),
         .right => attackAt(1, 0),
     };
 
-    return dmg;
+    const tile = TileType.from_int(attacked) orelse .border;
+
+    if (std.meta.eql(tile, .wood)) {
+        player.material += 1;
+    }
+
+    return tile;
 }
 
 fn peekAt(dir: Direction) TileType {

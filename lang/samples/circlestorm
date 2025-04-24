@@ -1,0 +1,14 @@
+while (true) {
+  while (peek right != border and peek right != storm) {
+    move right 1;
+  }
+  while (peek down != border and peek down != storm) {
+    move down 1;
+  }
+  while (peek left != border and peek left != storm) {
+    move left 1;
+  }
+  while (peek up != border and peek up != storm) {
+    move up 1;
+  } 
+}
