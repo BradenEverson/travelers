@@ -86,6 +86,7 @@ const OPEN = 0;
 const ENEMY = 1;
 const ROCK = 2;
 const WOOD = 3;
+const STORM = 4;
 
 let health = 100;
 let selectedType = OPEN;
@@ -269,7 +270,9 @@ let importObject = {
 
       if (nx < 0 || nx >= grid.x || ny < 0 || ny >= grid.y) {
         return -1;
-      } else {
+      } else if (inStorm(nx, ny)) { 
+        return STORM;
+      }else {
         return tile_types[y + dy][x + dx];
       }
     },
