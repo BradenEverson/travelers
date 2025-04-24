@@ -70,8 +70,8 @@ editor.on("inputRead", (cm, input) => {
   }
 });
 
-let x = 0;
-let y = 0;
+let x = Math.floor(Math.random() * 32);
+let y = Math.floor(Math.random() * 32);
 
 let stormLevel = 0;
 let stormTicks = 0;
@@ -83,7 +83,6 @@ function resetStorm() {
 
 // Tile Types
 const OPEN = 0;
-const ENEMY = 1;
 const ROCK = 2;
 const WOOD = 3;
 const STORM = 4;
@@ -133,9 +132,6 @@ async function drawGrid() {
         switch (type) {
           case OPEN:
             color = "#4ade80";
-            break;
-          case ENEMY:
-            color = "#9333ea";
             break;
           case ROCK:
             color = "#6b7280";
@@ -254,12 +250,7 @@ let importObject = {
       if (tile_types[ny][nx] == WOOD) {
         tile_types[ny][nx] = OPEN;
         return WOOD;
-      } else if (tile_types[ny][nx] == ENEMY) {
-        // TODO: Bounce enemy backwards until they hit something
-        tile_types[ny][nx] = OPEN;
-        tile_types[ny + dy][nx + dx] = ENEMY;
-        return ENEMY;
-      }
+      } 
 
       return 0.0;
     },
