@@ -87,6 +87,7 @@ const ENEMY = 1;
 const ROCK = 2;
 const WOOD = 3;
 const STORM = 4;
+const TRAP = 5;
 
 let health = 100;
 let selectedType = OPEN;
@@ -260,6 +261,19 @@ let importObject = {
       }
 
       return 0.0;
+    },
+
+    trapAt: (dx, dy) => {
+      const nx = x + dx;
+      const ny = y + dy;
+
+      if ((nx < 0 || nx >= grid.x || ny < 0 || ny >= grid.y) || tile_types[ny][nx] != OPEN) {
+        return false;
+      }
+      
+      tile_types[ny][nx] = TRAP;
+
+      return true;
     },
 
     lookAtRelative: (dx, dy) => {

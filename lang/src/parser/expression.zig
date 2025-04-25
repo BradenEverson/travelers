@@ -30,6 +30,7 @@ pub const Expression = union(enum) {
     move: struct { Direction, ?*const Expression },
     peek: Direction,
     attack: Direction,
+    trap: Direction,
 
     block: []*const Expression,
 
@@ -56,6 +57,10 @@ pub const Expression = union(enum) {
         switch (self.*) {
             .peek => |d| {
                 try writer.print("peek {}", .{d});
+            },
+
+            .trap => |d| {
+                try writer.print("trap {}", .{d});
             },
 
             .attack => |d| {

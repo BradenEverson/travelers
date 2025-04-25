@@ -19,6 +19,7 @@ pub const EvaluatorVtable = struct {
     while_fn: *const fn (*const Expression) void,
     peek_fn: *const fn (Direction) TileType,
     attack_fn: *const fn (Direction) TileType,
+    trap_fn: *const fn (Direction) bool,
 };
 
 pub const Evaluator = struct {
@@ -43,6 +44,11 @@ pub const Evaluator = struct {
             .peek => |direction| {
                 const tt = self.vtable.peek_fn(direction);
                 return .{ .tile = tt };
+            },
+
+            .trap => |direction| {
+                const trap_worked = self.vtable.trap_fn(direction);
+                return .{ .boolean = trap_worked };
             },
 
             .attack => |direction| {

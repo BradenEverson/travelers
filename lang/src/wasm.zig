@@ -20,6 +20,7 @@ pub extern "env" fn updatePosition(x: u32, y: u32) void;
 pub extern "env" fn moveRelative(dx: i32, dy: i32) void;
 pub extern "env" fn lookAtRelative(dx: i32, dy: i32) i32;
 pub extern "env" fn attackAt(dx: i32, dy: i32) i32;
+pub extern "env" fn trapAt(dx: i32, dy: i32) bool;
 
 pub fn print(l: Literal) void {
     console.log("{}", .{l});
@@ -41,7 +42,7 @@ export fn doDamage(dmg: u8) void {
 }
 
 var parser = Parser.init(null, allocator);
-var runtime = Evaluator.init(allocator, .{ .move_fn = enqueueMove, .print_fn = print, .block_fn = blockStatement, .while_fn = whileStatement, .peek_fn = peekAt, .attack_fn = attack });
+var runtime = Evaluator.init(allocator, .{ .move_fn = enqueueMove, .print_fn = print, .block_fn = blockStatement, .while_fn = whileStatement, .peek_fn = peekAt, .attack_fn = attack, .trap_fn = placeTrap });
 
 const Action = union(enum) {
     move: Direction,
@@ -76,6 +77,25 @@ fn peekAt(dir: Direction) TileType {
     };
 
     return peek;
+}
+
+fn placeTrap(dir: Direction) bool {
+    if (player.material < 3) {
+        return false;
+    }
+
+    const trap = switch (dir) {
+        .up => trapAt(0, -1),
+        .down => trapAt(0, 1),
+        .left => trapAt(-1, 0),
+        .right => trapAt(1, 0),
+    };
+
+    if (trap) {
+        player.material -= 3;
+    }
+
+    return trap;
 }
 
 fn enqueueMove(dir: Direction, amount: usize) void {
