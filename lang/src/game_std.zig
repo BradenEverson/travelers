@@ -7,6 +7,7 @@ pub const TileType = enum {
     wood,
     border,
     storm,
+    trap,
 
     pub fn from_int(from: i32) ?TileType {
         return switch (from) {
@@ -15,6 +16,7 @@ pub const TileType = enum {
             2 => .stone,
             3 => .wood,
             4 => .storm,
+            5 => .trap,
             else => null,
         };
     }
@@ -32,6 +34,7 @@ pub const TileType = enum {
             .wood => try writer.print("wood", .{}),
             .border => try writer.print("border", .{}),
             .storm => try writer.print("storm", .{}),
+            .trap => try writer.print("trap", .{}),
         }
     }
 };

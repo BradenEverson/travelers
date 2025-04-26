@@ -90,10 +90,10 @@ pub const Parser = struct {
                         const dir = direction_from_keyword(key) orelse unreachable;
                         expr.* = .{ .trap = dir };
                     },
-                    else => return error.UnexpectedKeyword,
+                    else => expr.* = .{ .literal = .{ .tile = .trap } },
                 }
             },
-            else => return error.ExpectedTokenFound,
+            else => expr.* = .{ .literal = .{ .tile = .trap } },
         }
     }
 
@@ -455,12 +455,14 @@ pub const Parser = struct {
 
                     break :val atk;
                 },
+
                 .trap => {
                     const trap = try self.allocator().create(Expression);
                     try self.trap_statement(trap);
 
                     break :val trap;
                 },
+
                 .true_key => {
                     self.advance();
                     const boolean = try self.allocator().create(Expression);

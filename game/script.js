@@ -144,6 +144,9 @@ async function drawGrid() {
           case WOOD:
             color = "#854d0e";
             break;
+          case TRAP:
+            color = "#380303";
+            break;
           default:
             color = "#000000";
         }
@@ -240,12 +243,16 @@ let importObject = {
       const nx = x + dx;
       const ny = y + dy;
 
-      if (tile_types[ny][nx] != OPEN) {
+      if (tile_types[ny][nx] != OPEN && tile_types[ny][nx] != TRAP) {
         return;
       }
 
       x = nx;
       y = ny;
+
+      if (tile_types[ny][nx] == TRAP) {
+        result.instance.exports.doDamage(20);
+      }
     },
 
     attackAt: (dx, dy) => {
@@ -318,7 +325,7 @@ WebAssembly.instantiateStreaming(
   function tickStorm() {
     stormTicks += 1;
 
-    if (stormTicks % 8 == 0 && inStorm(x, y)) {
+    if (stormTicks % 80 == 0 && inStorm(x, y)) {
       result.instance.exports.doDamage(1);
     }
 
