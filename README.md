@@ -12,7 +12,7 @@ To train your program for the field, you can test scripts in the dojo, a 32x32 c
 
 The rules of `Travelers` are relatively what you would expect, you can move, attack, place traps and peek in all 4 cardinal directions, a quick sample of these features would be:
 
-```rust
+```c
 
 while (peek right != trap) {
     move right;
