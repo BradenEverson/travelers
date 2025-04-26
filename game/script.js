@@ -237,22 +237,29 @@ let importObject = {
         (x == grid.x - 1 && dx > 0) ||
         (y == grid.y - 1 && dy > 0)
       ) {
-        return;
+        return -1;
       }
 
       const nx = x + dx;
       const ny = y + dy;
 
       if (tile_types[ny][nx] != OPEN && tile_types[ny][nx] != TRAP) {
-        return;
+        return -1;
       }
 
       x = nx;
       y = ny;
 
       if (tile_types[ny][nx] == TRAP) {
-        result.instance.exports.doDamage(20);
+          tile_types[ny][nx] = OPEN
+          return -2;
       }
+
+      return 0;
+    },
+
+    updateHealthBar: (hp) => {
+      document.getElementById("hp").innerText = `Health: ${hp}/100`;
     },
 
     attackAt: (dx, dy) => {
@@ -353,3 +360,4 @@ WebAssembly.instantiateStreaming(
     }, 25);
   });
 });
+

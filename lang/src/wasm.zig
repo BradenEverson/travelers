@@ -17,10 +17,11 @@ const TileType = game.TileType;
 const Evaluator = @import("./evaluator.zig").Evaluator;
 
 pub extern "env" fn updatePosition(x: u32, y: u32) void;
-pub extern "env" fn moveRelative(dx: i32, dy: i32) void;
+pub extern "env" fn moveRelative(dx: i32, dy: i32) i32;
 pub extern "env" fn lookAtRelative(dx: i32, dy: i32) i32;
 pub extern "env" fn attackAt(dx: i32, dy: i32) i32;
 pub extern "env" fn trapAt(dx: i32, dy: i32) bool;
+pub extern "env" fn updateHealthBar(hp: u8) void;
 
 pub fn print(l: Literal) void {
     console.log("{}", .{l});
@@ -38,7 +39,7 @@ var player = Unit.default();
 
 export fn doDamage(dmg: u8) void {
     player.health -|= dmg;
-    console.log("{}", .{player.health});
+    updateHealthBar(player.health);
 }
 
 var parser = Parser.init(null, allocator);
@@ -128,12 +129,20 @@ fn blockStatement(block: []*const Expression) void {
 
 fn move(dir: Direction, amount: usize) void {
     const amnt: i32 = @intCast(amount);
-    switch (dir) {
+    const res = switch (dir) {
         .left => moveRelative(-amnt, 0),
         .right => moveRelative(amnt, 0),
         .up => moveRelative(0, -amnt),
         .down => moveRelative(0, amnt),
+    };
+
+    if (res == -2) {
+        doDamage(20);
     }
+}
+
+export fn getHealth() u8 {
+    return player.health;
 }
 
 export fn alloc(len: u32) [*]const u8 {
