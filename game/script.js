@@ -70,8 +70,8 @@ editor.on("inputRead", (cm, input) => {
   }
 });
 
-let x = 0;
-let y = 0;
+let x = Math.floor(Math.random() * 32);
+let y = Math.floor(Math.random() * 32);
 let dead = false;
 
 let stormLevel = 0;
