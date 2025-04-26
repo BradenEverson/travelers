@@ -72,6 +72,7 @@ editor.on("inputRead", (cm, input) => {
 
 let x = 0;
 let y = 0;
+let dead = false;
 
 let stormLevel = 0;
 let stormTicks = 0;
@@ -357,6 +358,11 @@ WebAssembly.instantiateStreaming(
       tickStorm();
       drawGrid();
       result.instance.exports.step();
+
+      if (result.instance.exports.getHealth() == 0 && !dead) {
+        dead = true;
+        alert("You're so dead bro")
+      }
     }, 25);
   });
 });
