@@ -27,3 +27,9 @@ while (peek right != trap) {
 It's important to note how traps work. Robots spawn with 3 wood in their inventory. Placing a trap in any direction costs 3 wood and upon any robot entering the tile with the trap they will receive 20 damage. To gain more wood for traps, you must collect it by attacking wood tiles with `attack {direction}`.
 
 Happy hunting
+
+### Current State
+
+Travelers is currently in heavy development, it's my current personal project I'm devoting the most time to. The current functionality reaches the ability to create and train your own robot script in the Dojo, where you can sandbox in different terrain elements and simulated enemies. 
+
+The next step I'm working on is some added convenience to the training page, followed by the multiplayer server that can simulate a fight to the death between a series of registered and submitted scripts. Feel free to check everything out in its current state, or check back in later when things are looking a little cooler
