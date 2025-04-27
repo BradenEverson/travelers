@@ -228,10 +228,6 @@ window.addEventListener("resize", handleResize);
 
 let importObject = {
   env: {
-    updatePosition: (new_x, new_y) => {
-      x = new_x;
-      y = new_y;
-    },
     moveRelative: (dx, dy) => {
       if (
         (x == 0 && dx < 0) ||
@@ -334,7 +330,7 @@ WebAssembly.instantiateStreaming(
   function tickStorm() {
     stormTicks += 1;
 
-    if (stormTicks % 80 == 0 && inStorm(x, y)) {
+    if (stormTicks % 20 == 0 && inStorm(x, y)) {
       result.instance.exports.doDamage(1);
     }
 
