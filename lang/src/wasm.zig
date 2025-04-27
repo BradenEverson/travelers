@@ -1,8 +1,9 @@
 //! Main wasm runtime
 
-const console = @import("./wasm/core.zig");
 const std = @import("std");
+const console = @import("./wasm/core.zig");
 const tokenizer = @import("./tokenizer.zig");
+
 const Parser = @import("./parser.zig").Parser;
 
 const expression = @import("./parser/expression.zig");
@@ -16,18 +17,14 @@ const TileType = game.TileType;
 
 const Evaluator = @import("./evaluator.zig").Evaluator;
 
-pub extern "env" fn moveRelative(dx: i32, dy: i32) i32;
-pub extern "env" fn lookAtRelative(dx: i32, dy: i32) i32;
-pub extern "env" fn attackAt(dx: i32, dy: i32) i32;
-pub extern "env" fn trapAt(dx: i32, dy: i32) bool;
-pub extern "env" fn updateHealthBar(hp: u8) void;
+const exports = @import("./wasm/exports.zig");
 
 pub fn print(l: Literal) void {
     console.log("{}", .{l});
 }
 
 pub fn lookAt(dx: i32, dy: i32) TileType {
-    return TileType.from_int(lookAtRelative(dx, dy)) orelse .border;
+    return TileType.from_int(exports.lookAtRelative(dx, dy)) orelse .border;
 }
 
 const allocator = std.heap.wasm_allocator;
@@ -38,7 +35,7 @@ var player = Unit.default();
 
 export fn doDamage(dmg: u8) void {
     player.health -|= dmg;
-    updateHealthBar(player.health);
+    exports.updateHealthBar(player.health);
 }
 
 var parser = Parser.init(null, allocator);
@@ -53,10 +50,10 @@ var move_queue = MoveQueue{};
 
 fn attack(dir: Direction) TileType {
     const attacked = switch (dir) {
-        .up => attackAt(0, -1),
-        .down => attackAt(0, 1),
-        .left => attackAt(-1, 0),
-        .right => attackAt(1, 0),
+        .up => exports.attackAt(0, -1),
+        .down => exports.attackAt(0, 1),
+        .left => exports.attackAt(-1, 0),
+        .right => exports.attackAt(1, 0),
     };
 
     const tile = TileType.from_int(attacked) orelse .border;
@@ -85,10 +82,10 @@ fn placeTrap(dir: Direction) bool {
     }
 
     const trap = switch (dir) {
-        .up => trapAt(0, -1),
-        .down => trapAt(0, 1),
-        .left => trapAt(-1, 0),
-        .right => trapAt(1, 0),
+        .up => exports.trapAt(0, -1),
+        .down => exports.trapAt(0, 1),
+        .left => exports.trapAt(-1, 0),
+        .right => exports.trapAt(1, 0),
     };
 
     if (trap) {
@@ -129,10 +126,10 @@ fn blockStatement(block: []*const Expression) void {
 fn move(dir: Direction, amount: usize) void {
     const amnt: i32 = @intCast(amount);
     const res = switch (dir) {
-        .left => moveRelative(-amnt, 0),
-        .right => moveRelative(amnt, 0),
-        .up => moveRelative(0, -amnt),
-        .down => moveRelative(0, amnt),
+        .left => exports.moveRelative(-amnt, 0),
+        .right => exports.moveRelative(amnt, 0),
+        .up => exports.moveRelative(0, -amnt),
+        .down => exports.moveRelative(0, amnt),
     };
 
     if (res == -2) {
