@@ -1,6 +1,6 @@
 # Travelers
 
-Travelers is a robot battle royale where some amount of players fight in a 64x64 grid. The catch: every fighter is a robot controlled from a customized embedded language: FightScript. 
+Travelers is a robot/cellular automata battle royale where some amount of players fight in a 64x64 grid. The catch: every fighter is a robot controlled from a customized embedded language: FightScript. 
 
 FightScript is a simple C-Style language with looping, conditionals and function declarations. Furthermore, keywords such as `move`, `peek`, `attack` and `trap` allow robots to learn about their environment and attempt to hinder others. 
 
