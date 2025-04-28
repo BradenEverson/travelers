@@ -5,6 +5,11 @@ const WOOD = 3;
 const STORM = 4;
 const TRAP = 5;
 
+const UP = 0;
+const RIGHT = 1;
+const DOWN = 2;
+const LEFT = 3;
+
 let tile_types = [];
 let stormLevel = 0;
 let canvas, ctx;
