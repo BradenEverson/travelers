@@ -134,9 +134,7 @@ function shuffleArray(array) {
 
 function startGame() {
   const id = localStorage.getItem("id");
-  fetch("/create?" + new URLSearchParams({
-    id: id,
-}), {
+  fetch(`/create?id=${id}`, {
     method: "GET",
   })
     .then((response) => {
