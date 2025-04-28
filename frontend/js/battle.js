@@ -9,6 +9,8 @@ let tile_types = [];
 let stormLevel = 0;
 let canvas, ctx;
 
+let spawnable_points = [];
+
 function init() {
     canvas = document.getElementById("grid");
     ctx = canvas.getContext("2d");
@@ -17,14 +19,26 @@ function init() {
 }
 
 function generateTerrain() {
-    tile_types = Array.from({ length: GRID_SIZE }, () => 
-        Array.from({ length: GRID_SIZE }, () => {
+    let x = 0;
+    tile_types = Array.from({ length: GRID_SIZE }, () => {
+        let y = 0;
+        const row = Array.from({ length: GRID_SIZE }, () => {
             const rand = Math.random();
-            if (rand < 0.1) return ROCK;
-            if (rand < 0.2) return WOOD;
-            return OPEN;
-        })
-    );
+            let tile;
+            if (rand < 0.1) {
+                tile = ROCK;
+            } else if (rand < 0.2) {
+                tile = WOOD;
+            } else {
+                tile = OPEN;
+                spawnable_points.push([x, y]);
+            }
+            y += 1;
+            return tile;
+        });
+        x += 1;
+        return row;
+    });
 }
 
 function drawGrid() {
