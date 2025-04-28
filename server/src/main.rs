@@ -2,9 +2,9 @@
 
 use hyper::server::conn::http1;
 use hyper_util::rt::TokioIo;
-use server::serve::BattleService;
-use std::env;
-use tokio::net::TcpListener;
+use server::{serve::BattleService, state::ServerState};
+use std::{env, sync::Arc};
+use tokio::{net::TcpListener, sync::Mutex};
 
 #[tokio::main]
 async fn main() {
@@ -15,7 +15,9 @@ async fn main() {
         .await
         .expect("Failed to bind to default");
 
-    let service = BattleService::default();
+    let state = Arc::new(Mutex::new(ServerState::default()));
+    let service = BattleService::from(state);
+
     loop {
         let (socket, _) = listener
             .accept()

@@ -6,12 +6,23 @@ use hyper::{
     body::{self, Bytes},
     service::Service,
 };
-use std::{collections::HashMap, fs::File, future::Future, io::Read, pin::Pin};
+use std::{collections::HashMap, fs::File, future::Future, io::Read, pin::Pin, sync::Arc};
+use tokio::sync::Mutex;
 use url::Url;
 
+use crate::state::ServerState;
+
 /// The service responsible for creating new battles
-#[derive(Default, Clone)]
-pub struct BattleService;
+#[derive(Clone)]
+pub struct BattleService {
+    state: Arc<Mutex<ServerState>>,
+}
+
+impl From<Arc<Mutex<ServerState>>> for BattleService {
+    fn from(state: Arc<Mutex<ServerState>>) -> Self {
+        Self { state }
+    }
+}
 
 impl Service<Request<body::Incoming>> for BattleService {
     type Response = Response<Full<Bytes>>;
@@ -20,6 +31,7 @@ impl Service<Request<body::Incoming>> for BattleService {
 
     fn call(&self, req: Request<body::Incoming>) -> Self::Future {
         let mut response = Response::builder();
+        let state = self.state.clone();
 
         let res = async move {
             match (req.method(), req.uri().path()) {
