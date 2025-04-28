@@ -4,6 +4,7 @@
 use std::collections::HashMap;
 
 use rand::{rng, seq::IteratorRandom};
+use serde::Serialize;
 use uuid::Uuid;
 
 /// Most travelers in a fight
@@ -83,4 +84,13 @@ impl Traveler {
     pub fn lose(&mut self) {
         self.losses += 1;
     }
+}
+
+/// Match metadata for js
+#[derive(Clone, Debug, Serialize)]
+pub struct Match {
+    /// Creator's script
+    pub creator: String,
+    /// All other scripts
+    pub others: Vec<String>,
 }

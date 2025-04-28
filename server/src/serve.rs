@@ -6,7 +6,6 @@ use hyper::{
     body::{self, Bytes},
     service::Service,
 };
-use serde::Serialize;
 use std::{
     collections::HashMap, fs::File, future::Future, io::Read, pin::Pin, str::FromStr, sync::Arc,
 };
@@ -14,7 +13,7 @@ use tokio::sync::Mutex;
 use url::{Url, form_urlencoded};
 use uuid::Uuid;
 
-use crate::state::{ServerState, Traveler};
+use crate::state::{Match, ServerState, Traveler};
 
 /// The service responsible for creating new battles
 #[derive(Clone)]
@@ -165,11 +164,4 @@ pub fn generate_query_map(uri: String) -> HashMap<String, String> {
         .query_pairs()
         .map(|(k, v)| (k.to_string(), v.to_string()))
         .collect()
-}
-
-/// Match metadata for js
-#[derive(Clone, Debug, Serialize)]
-pub struct Match {
-    creator: String,
-    others: Vec<String>,
 }
