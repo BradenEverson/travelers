@@ -1,4 +1,5 @@
 const GRID_SIZE = 64;
+
 const OPEN = 0;
 const ROCK = 2;
 const WOOD = 3;
@@ -14,10 +15,12 @@ let tile_types = [];
 let stormLevel = 0;
 let canvas, ctx;
 
-let spawnable_points = [];
+let spawnablePoints = [];
 
 let x = 0;
 let y = 0;
+
+let enemies = [];
 
 function init() {
   canvas = document.getElementById("grid");
@@ -39,7 +42,7 @@ function generateTerrain() {
         tile = WOOD;
       } else {
         tile = OPEN;
-        spawnable_points.push([x, y]);
+        spawnablePoints.push([x, y]);
       }
       y += 1;
       return tile;
@@ -63,9 +66,11 @@ function drawGrid() {
   drawGridLines(cellSize);
 }
 
-function getTileColor(x, y) {
-  if (inStorm(x, y)) return "#676bc2";
-  switch (tile_types[y][x]) {
+function getTileColor(lx, ly) {
+  if (inStorm(lx, ly)) return "#676bc2";
+  if (x == lx && y == ly) return "#fc0303";
+
+  switch (tile_types[ly][lx]) {
     case ROCK:
       return "#6b7280";
     case WOOD:
@@ -73,7 +78,7 @@ function getTileColor(x, y) {
     case OPEN:
       return "#4ade80";
     case ENEMY:
-      return "#9333ea";
+      return "#9900ff";
     case TRAP:
       return "#380303";
     default:
@@ -119,8 +124,15 @@ async function startCountdown() {
   startGame();
 }
 
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
 function startGame() {
-  // TODO: Request who's in the game and load em all
   const id = localStorage.getItem("id");
   fetch("/create?" + new URLSearchParams({
     id: id,
@@ -134,7 +146,13 @@ function startGame() {
       return response.json();
     })
     .then((json) => {
-      console.log(json);
+        const spawns = shuffleArray(spawnablePoints)
+        playerSpawn = spawns[0];
+
+
+        x = playerSpawn[0];
+        y = playerSpawn[1];
+        console.log(`${x}, ${y}`);
     })
     .catch((error) => console.error("Error: ", error));
 
