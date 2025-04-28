@@ -33,6 +33,17 @@ var pc: usize = 0;
 var instructions = std.ArrayList(*const Expression).init(allocator);
 var player = Unit.default();
 
+export fn hitDirection(dir: i32, mag: usize) void {
+    const direction: Direction = switch (dir) {
+        0 => .up,
+        1 => .right,
+        2 => .down,
+        else => .left,
+    };
+
+    enqueueMove(direction, mag);
+}
+
 export fn doDamage(dmg: u8) void {
     player.health -|= dmg;
     exports.updateHealthBar(player.health);
