@@ -295,20 +295,78 @@ function startGame() {
             y: point[1],
             dead: false,
           };
+
+          enemies.push(enemyInfo);
           
           let enemyMemory = new WebAssembly.Memory({
               initial: 2,
           });
 
+
           const enemyVtable = {
+              env: {
+                  moveRelative: (dx, dy) => {
+                      let ex = enemies[i].x;
+                      let ey = enemies[i].y;
 
+                      if (
+                          (ex == 0 && dx < 0) ||
+                          (ey == 0 && dy < 0) ||
+                          (ex == GRID_SIZE - 1 && dx > 0) ||
+                          (ey == GRID_SIZE - 1 && dy > 0)
+                      ) {
+                          return -1;
+                      }
+
+                      const nx = ex + dx;
+                      const ny = ey + dy;
+
+                      if (tile_types[ny][nx] != OPEN && tile_types[ny][nx] != TRAP) {
+                          return -1;
+                      }
+                      
+
+                      enemies[i].x = nx;
+                      enemies[i].y = ny;
+
+                      if (tile_types[ny][nx] == TRAP) {
+                          tile_types[ny][nx] = OPEN;
+                          return -2;
+                      }
+
+                      tile_types[y][x] = OPEN;
+                      tile_types[ny][nx] = ENEMY;
+
+                      return 0;
+                  },
+
+                  updateHealthBar: (hp) => {},
+
+                  attackAt: (dx, dy) => {
+                      //todo!
+                      return 0.0;
+                  },
+
+                  trapAt: (dx, dy) => {
+                      // todo!
+                      return 0.0;
+                  },
+
+                  lookAtRelative: (dx, dy) => {
+                      // todo!
+                      return 0.0
+                  },
+
+                  log_js: (ptr, len) => {
+                      const buffer = new Uint8Array(memory.buffer, ptr, len);
+                      const str = new TextDecoder().decode(buffer);
+                      console.log("Enemy: ", str);
+                  },
+
+                  memory: enemyMemory,
+              },
           };
-
-        
-
-        console.log(newScript);
       }
-
     });
 
   setInterval(updateStorm, 30000);
