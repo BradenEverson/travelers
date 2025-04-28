@@ -56,7 +56,13 @@ impl Service<Request<body::Incoming>> for BattleService {
                 }
 
                 (&Method::GET, "/battle") => {
-                    todo!("Go to battle page");
+                    let mut buf = vec![];
+                    let mut page = File::open("frontend/battle.html").expect("Failed to find file");
+                    page.read_to_end(&mut buf)
+                        .expect("Failed to read to buffer");
+                    response
+                        .status(StatusCode::OK)
+                        .body(Full::new(Bytes::copy_from_slice(&buf)))
                 }
 
                 (&Method::GET, wasm) if wasm.starts_with("/wasm") => {

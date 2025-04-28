@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Battle Royale Arena</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="frontend/battle.css" rel="stylesheet"/>
+    </head>
+    <body class="bg-gray-900 p-4">
+        <div class="battle-container">
+            <div class="text-red-500 bg-gray-800 p-4 flex justify-between">
+                <b id="hp" class="text-2xl">Health: 100/100</b>
+                <b id="storm" class="text-2xl text-blue-400">Storm Level: 0</b>
+            </div>
+
+            <div class="flex-1 flex items-center justify-center relative">
+                <div id="countdown" class="countdown" style="display: none"></div>
+                <div id="storm-overlay"></div>
+                <canvas id="grid" width="720" height="720" class="border-4 border-gray-700 max-w-full max-h-full"></canvas>
+            </div>
+        </div>
+
+        <script src="frontend/js/battle.js"></script>
+    </body>
+</html>
