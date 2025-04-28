@@ -1,6 +1,6 @@
 //! Service Implementation
 
-use http_body_util::Full;
+use http_body_util::{BodyExt, Full};
 use hyper::{
     Method, Request, Response, StatusCode,
     body::{self, Bytes},
@@ -8,9 +8,9 @@ use hyper::{
 };
 use std::{collections::HashMap, fs::File, future::Future, io::Read, pin::Pin, sync::Arc};
 use tokio::sync::Mutex;
-use url::Url;
+use url::{Url, form_urlencoded};
 
-use crate::state::ServerState;
+use crate::state::{ServerState, Traveler};
 
 /// The service responsible for creating new battles
 #[derive(Clone)]
@@ -31,7 +31,7 @@ impl Service<Request<body::Incoming>> for BattleService {
 
     fn call(&self, req: Request<body::Incoming>) -> Self::Future {
         let mut response = Response::builder();
-        let _ = self.state.clone();
+        let state = self.state.clone();
 
         let res = async move {
             match (req.method(), req.uri().path()) {
@@ -81,6 +81,23 @@ impl Service<Request<body::Incoming>> for BattleService {
                     response
                         .status(StatusCode::OK)
                         .body(Full::new(Bytes::copy_from_slice(&buf)))
+                }
+
+                (&Method::POST, "/register") => {
+                    let body = req.collect().await.expect("Failed to collect body");
+                    let body_bytes = body.to_bytes();
+
+                    let form_params: HashMap<String, String> =
+                        form_urlencoded::parse(&body_bytes).into_owned().collect();
+
+                    let travler = Traveler::from_source(&form_params["code"]);
+                    let id = state.lock().await.register(travler);
+
+                    response
+                        .status(StatusCode::OK)
+                        .body(Full::new(Bytes::copy_from_slice(
+                            format!("{id}").as_bytes(),
+                        )))
                 }
 
                 (&Method::GET, fs) if fs.starts_with("/frontend/") => {

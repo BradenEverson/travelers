@@ -16,24 +16,32 @@
                 display: flex;
                 flex-direction: column;
             }
+            .container-fix {
+                height: calc(100vh - 2rem); 
+            }
         </style>
     </head>
     <body class="bg-gray-100 p-4">
-        <div class="flex flex-row h-screen gap-4">
-            <div class="flex-1 flex flex-col bg-gray-900 rounded-lg shadow-md overflow-hidden">
+        <div class="flex flex-row container-fix gap-4">
+            <div class="flex-1 flex flex-col bg-gray-900 rounded-lg shadow-md overflow-hidden min-w-0">
                 <div class="bg-gray-800 text-white p-2 flex justify-between items-center">
-                    <span class="font-mono text-sm">main</span>
-                    <button id="run" class="bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded text-sm font-medium transition-colors">
+                    <span class="font-mono text-lg truncate">main.fight</span>
+                    <button id="run" class="bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded text-lg transition-colors whitespace-nowrap">
                         Run
                     </button>
                 </div>
-                <div id="editor-container" class="flex-1 min-h-0">
+                <div id="editor-container" class="flex-1 min-h-0 text-2xl">
                     <textarea id="code" class="hidden"></textarea>
+                </div>
+                <div class="bg-gray-800 text-white p-2 flex justify-end">
+                    <button id="submit" class="bg-red-600 hover:bg-red-700 text-white px-4 py-1 rounded text-lg transition-colors whitespace-nowrap">
+                        Submit to Battle!
+                    </button>
                 </div>
             </div>
 
-            <div class="flex-1 flex flex-col bg-white rounded-lg shadow-md overflow-hidden">
-                <div class="bg-gray-100 p-2 flex gap-2">
+            <div class="flex-1 flex flex-col bg-white rounded-lg shadow-md overflow-hidden min-w-0">
+                <div class="bg-gray-100 p-2 flex gap-2 overflow-x-auto">
                     <button data-type="0" class="tile-btn px-4 py-2 rounded bg-green-600 text-white active">Open</button>
                     <button data-type="1" class="tile-btn px-4 py-2 rounded bg-purple-600 text-white">Enemy</button>
                     <button data-type="2" class="tile-btn px-4 py-2 rounded bg-gray-600 text-white">Rock</button>
@@ -42,8 +50,8 @@
                 <div class="text-red-500 bg-gray-100 p-2 flex gap-2">
                     <b id="hp">Health: 100/100</b>
                 </div>
-                <div class="flex-1 flex items-center justify-center p-4">
-                    <canvas id="grid" width="720" height="720" class="border border-gray-200"></canvas>
+                <div class="flex-1 min-h-0 p-4 flex items-center justify-center">
+                    <canvas id="grid" width="720" height="720" class="border border-gray-200 max-w-full max-h-full"></canvas>
                 </div>
             </div>
         </div>
@@ -53,6 +61,7 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/hint/show-hint.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/hint/javascript-hint.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/edit/closebrackets.min.js"></script>
+
         <script src="frontend/js/editor.js"></script>
         <script src="frontend/js/script.js"></script>
     </body>

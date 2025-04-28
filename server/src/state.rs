@@ -32,3 +32,24 @@ pub struct Traveler {
     /// How many loses
     pub losses: usize,
 }
+
+impl Traveler {
+    /// Creates a new traveler from source
+    pub fn from_source<STR: Into<String>>(src: STR) -> Self {
+        Self {
+            source_code: src.into(),
+            wins: 0,
+            losses: 0,
+        }
+    }
+
+    /// When a traveler wins
+    pub fn win(&mut self) {
+        self.wins += 1;
+    }
+
+    /// When a traveler loses
+    pub fn lose(&mut self) {
+        self.losses += 1;
+    }
+}
