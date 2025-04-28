@@ -55,6 +55,10 @@ impl Service<Request<body::Incoming>> for BattleService {
                         .body(Full::new(Bytes::copy_from_slice(&buf)))
                 }
 
+                (&Method::GET, "/battle") => {
+                    todo!("Go to battle page");
+                }
+
                 (&Method::GET, wasm) if wasm.starts_with("/wasm") => {
                     let mut buf = vec![];
                     let mut w =
