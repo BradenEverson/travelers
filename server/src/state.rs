@@ -30,6 +30,11 @@ impl ServerState {
         state.register(up);
         state.register(dancer);
 
+        state.fighters.insert(
+            Uuid::from_str("7d2c854f-cbf5-48c7-8ae7-5ebf90212ff3").unwrap(),
+            Traveler::from_str("move up 10;").unwrap(),
+        );
+
         state
     }
     /// Registers a new fighter and returns their UUID
@@ -42,6 +47,7 @@ impl ServerState {
 
     /// Creates a set of fighters for a battle
     pub fn matchmake(&self, initiator: Uuid) -> Vec<Traveler> {
+        // println!("{self:?}");
         let init = self.fighters[&initiator].clone();
         let mut contendors: Vec<_> = self
             .fighters
@@ -52,7 +58,7 @@ impl ServerState {
 
         let mut fighters = vec![init];
 
-        for _ in 0..fighters.len().min(MATCHMAKER_MAX) - 1 {
+        for _ in 0..(contendors.len().min(MATCHMAKER_MAX - 1)) {
             let (i, out) = contendors
                 .iter()
                 .cloned()
@@ -60,10 +66,11 @@ impl ServerState {
                 .choose(&mut rng())
                 .unwrap();
 
-            contendors.remove(i);
             fighters.push(out);
+            contendors.remove(i);
         }
 
+        println!("{fighters:?}");
         fighters
     }
 }

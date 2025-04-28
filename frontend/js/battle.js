@@ -1,6 +1,7 @@
 const GRID_SIZE = 64;
 
 const OPEN = 0;
+const ENEMY = 1;
 const ROCK = 2;
 const WOOD = 3;
 const STORM = 4;
@@ -324,7 +325,6 @@ function startGame() {
                       if (tile_types[ny][nx] != OPEN && tile_types[ny][nx] != TRAP) {
                           return -1;
                       }
-                      
 
                       enemies[i].x = nx;
                       enemies[i].y = ny;
@@ -334,7 +334,7 @@ function startGame() {
                           return -2;
                       }
 
-                      tile_types[y][x] = OPEN;
+                      tile_types[ey][ex] = OPEN;
                       tile_types[ny][nx] = ENEMY;
 
                       return 0;
@@ -366,6 +366,47 @@ function startGame() {
                   memory: enemyMemory,
               },
           };
+
+
+      WebAssembly.instantiateStreaming(
+        fetch("wasm/traveler_wasm.wasm"),
+        enemyVtable,
+      ).then((result) => {
+        const wasmMemoryArray = new Uint8Array(enemyMemory.buffer);
+
+        function stringToPtr(str) {
+          const encoder = new TextEncoder();
+          const encoded = encoder.encode(str);
+          const ptr = result.instance.exports.alloc(encoded.length);
+          const mem = new Uint8Array(enemyMemory.buffer);
+          mem.set(encoded, ptr);
+
+          return [ptr, encoded.length];
+        }
+
+        let stormTicks = 0;
+
+        function tickStorm() {
+          stormTicks += 1;
+
+          if (stormTicks % 20 == 0 && inStorm(enemies[i].x, enemies[i].y)) {
+            result.instance.exports.doDamage(1);
+          }
+        }
+
+        const code = json.others[i];
+        const [ptr, len] = stringToPtr(code);
+        const res = result.instance.exports.loadProgram(ptr, len);
+
+        setInterval(() => {
+          tickStorm();
+          result.instance.exports.step();
+
+          if (result.instance.exports.getHealth() == 0 && !dead) {
+            dead = true;
+          }
+        }, 25);
+      });
       }
     });
 
