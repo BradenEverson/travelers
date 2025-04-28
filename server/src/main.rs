@@ -15,7 +15,7 @@ async fn main() {
         .await
         .expect("Failed to bind to default");
 
-    let state = Arc::new(Mutex::new(ServerState::default()));
+    let state = Arc::new(Mutex::new(ServerState::sample_config()));
     let service = BattleService::from(state);
 
     loop {

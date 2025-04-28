@@ -1,7 +1,7 @@
 //! Server State, including registry of all source code files for all submissions ever (todo:
 //! MongoDB)
 
-use std::collections::HashMap;
+use std::{collections::HashMap, str::FromStr};
 
 use rand::{rng, seq::IteratorRandom};
 use serde::Serialize;
@@ -18,6 +18,20 @@ pub struct ServerState {
 }
 
 impl ServerState {
+    /// Constructs a new state with placeholder defaults
+    pub fn sample_config() -> Self {
+        let mut state = Self::default();
+
+        let up = Traveler::from_str("move up;").unwrap();
+        let dancer =
+            Traveler::from_str("while (true) { move down; move left; move up; move right; }")
+                .unwrap();
+
+        state.register(up);
+        state.register(dancer);
+
+        state
+    }
     /// Registers a new fighter and returns their UUID
     pub fn register(&mut self, new: Traveler) -> Uuid {
         let new_id = Uuid::new_v4();
@@ -63,6 +77,17 @@ pub struct Traveler {
     pub wins: usize,
     /// How many loses
     pub losses: usize,
+}
+
+impl FromStr for Traveler {
+    type Err = ();
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(Self {
+            source_code: s.into(),
+            wins: 0,
+            losses: 0,
+        })
+    }
 }
 
 impl Traveler {
