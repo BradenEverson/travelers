@@ -180,8 +180,8 @@ let importObject = {
       y = ny;
 
       if (tile_types[ny][nx] == TRAP) {
-          tile_types[ny][nx] = OPEN
-          return -2;
+        tile_types[ny][nx] = OPEN;
+        return -2;
       }
 
       return 0;
@@ -210,10 +210,16 @@ let importObject = {
       const nx = x + dx;
       const ny = y + dy;
 
-      if ((nx < 0 || nx >= grid.x || ny < 0 || ny >= grid.y) || tile_types[ny][nx] != OPEN) {
+      if (
+        nx < 0 ||
+        nx >= grid.x ||
+        ny < 0 ||
+        ny >= grid.y ||
+        tile_types[ny][nx] != OPEN
+      ) {
         return false;
       }
-      
+
       tile_types[ny][nx] = TRAP;
 
       return true;
@@ -225,9 +231,9 @@ let importObject = {
 
       if (nx < 0 || nx >= grid.x || ny < 0 || ny >= grid.y) {
         return -1;
-      } else if (inStorm(nx, ny)) { 
+      } else if (inStorm(nx, ny)) {
         return STORM;
-      }else {
+      } else {
         return tile_types[y + dy][x + dx];
       }
     },
@@ -289,9 +295,8 @@ WebAssembly.instantiateStreaming(
 
       if (result.instance.exports.getHealth() == 0 && !dead) {
         dead = true;
-        alert("You're dead :(")
+        alert("You're dead :(");
       }
     }, 25);
   });
 });
-

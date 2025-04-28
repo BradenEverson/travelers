@@ -68,30 +68,30 @@ editor.on("inputRead", (cm, input) => {
 });
 
 document.getElementById("submit").addEventListener("click", () => {
-    const code = editor.getValue();
+  const code = editor.getValue();
 
-    const formData = new URLSearchParams();
-    formData.append("code", code);
-    
-    fetch("/register", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: formData
+  const formData = new URLSearchParams();
+  formData.append("code", code);
+
+  fetch("/register", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: formData,
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      return response.text();
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error("Network response was not ok");
-        }
-        return response.text();
+    .then((uuid) => {
+      console.log(`Registered Script with ID ${uuid}`);
+      localStorage.setItem("id", uuid);
+      window.location.href = "/";
     })
-    .then(uuid => {
-        console.log(`Registered Script with ID ${uuid}`);
-        localStorage.setItem("id", uuid);
-        window.location.href = "/";
-    })
-    .catch(error => {
-        console.error("Error:", error);
+    .catch((error) => {
+      console.error("Error:", error);
     });
 });

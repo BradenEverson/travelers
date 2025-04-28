@@ -38,7 +38,7 @@ impl ServerState {
 
         let mut fighters = vec![init];
 
-        for _ in 0..fighters.len().min(MATCHMAKER_MAX - 1) {
+        for _ in 0..fighters.len().min(MATCHMAKER_MAX) - 1 {
             let (i, out) = contendors
                 .iter()
                 .cloned()

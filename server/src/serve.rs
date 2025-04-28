@@ -148,7 +148,9 @@ impl Service<Request<body::Incoming>> for BattleService {
                         .body(Full::new(Bytes::copy_from_slice(&buf)))
                 }
 
-                _ => unimplemented!(),
+                other_combo => {
+                    unimplemented!("{other_combo:?} is not a valid route pair for this server :(")
+                }
             }
         };
 
