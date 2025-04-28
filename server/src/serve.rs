@@ -31,7 +31,7 @@ impl Service<Request<body::Incoming>> for BattleService {
 
     fn call(&self, req: Request<body::Incoming>) -> Self::Future {
         let mut response = Response::builder();
-        let state = self.state.clone();
+        let _ = self.state.clone();
 
         let res = async move {
             match (req.method(), req.uri().path()) {
