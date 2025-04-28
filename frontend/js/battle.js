@@ -289,6 +289,23 @@ function startGame() {
         
       for (let i = 0; i < json.others.length; i++) {
         const newScript = json.others[i];
+          const point = spawnablePoints[i + 1];
+          const enemyInfo = {
+            x: point[0],
+            y: point[1],
+            dead: false,
+          };
+          
+          let enemyMemory = new WebAssembly.Memory({
+              initial: 2,
+          });
+
+          const enemyVtable = {
+
+          };
+
+        
+
         console.log(newScript);
       }
 
