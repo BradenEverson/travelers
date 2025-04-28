@@ -3,7 +3,11 @@
 
 use std::collections::HashMap;
 
+use rand::{rng, seq::IteratorRandom};
 use uuid::Uuid;
+
+/// Most travelers in a fight
+const MATCHMAKER_MAX: usize = 32;
 
 /// The server's internal state for matchmaking
 #[derive(Debug, Default)]
@@ -19,6 +23,33 @@ impl ServerState {
         self.fighters.insert(new_id, new);
 
         new_id
+    }
+
+    /// Creates a set of fighters for a battle
+    pub fn matchmake(&self, initiator: Uuid) -> Vec<Traveler> {
+        let init = self.fighters[&initiator].clone();
+        let mut contendors: Vec<_> = self
+            .fighters
+            .iter()
+            .filter(|(key, _)| *key != &initiator)
+            .map(|(_, v)| v.clone())
+            .collect();
+
+        let mut fighters = vec![init];
+
+        for _ in 0..fighters.len().min(MATCHMAKER_MAX - 1) {
+            let (i, out) = contendors
+                .iter()
+                .cloned()
+                .enumerate()
+                .choose(&mut rng())
+                .unwrap();
+
+            contendors.remove(i);
+            fighters.push(out);
+        }
+
+        fighters
     }
 }
 
