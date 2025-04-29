@@ -1,0 +1,32 @@
+.countdown {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 10rem;
+    font-weight: bold;
+    color: white;
+    text-shadow: 0 0 20px rgba(255, 0, 0, 0.8);
+    z-index: 100;
+    animation: pulse 0.5s infinite alternate;
+}
+@keyframes pulse {
+    from { transform: translate(-50%, -50%) scale(1); }
+    to { transform: translate(-50%, -50%) scale(1.2); }
+}
+#storm-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, transparent, rgba(103, 107, 194, 0.3));
+    pointer-events: none;
+    z-index: 10;
+}
+.battle-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: #1a202c;
+}

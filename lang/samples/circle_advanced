@@ -1,0 +1,34 @@
+while (true) {
+  while (peek right != border and peek right != storm) {
+    if (peek right == wood) {
+      attack right;
+    } else if (peek right == stone) {
+      move down;
+    }
+    move right 1;
+  }
+  while (peek down != border and peek down != storm) {
+    if (peek down == wood) {
+      attack down;
+    } else if (peek down == stone) {
+      move left;
+    }
+    move down 1;
+  }
+  while (peek left != border and peek left != storm) {
+    if (peek left == wood) {
+      attack left;
+    } else if (peek left == stone) {
+      move up;
+    }
+    move left 1;
+  }
+  while (peek up != border and peek up != storm) {
+    if (peek up == wood) {
+      attack up;
+    } else if (peek up == stone) {
+      move right;
+    }
+    move up 1;
+  } 
+}

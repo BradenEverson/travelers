@@ -2,75 +2,6 @@ let memory = new WebAssembly.Memory({
   initial: 2,
 });
 
-const customKeywords = [
-  "move",
-  "left",
-  "right",
-  "up",
-  "down",
-  "if",
-  "else",
-  "let",
-  "while",
-  "for",
-  "true",
-  "false",
-  "and",
-  "or",
-  "peek",
-  "attack",
-  "stone",
-  "wood",
-  "open",
-  "enemy",
-  "border",
-  "storm",
-  "trap",
-];
-
-editor = CodeMirror.fromTextArea(document.getElementById("code"), {
-  mode: {
-    name: "javascript",
-    extraKeywords: customKeywords.join(" "),
-  },
-  theme: "dracula",
-  lineNumbers: true,
-  tabSize: 2,
-  indentUnit: 2,
-  lineWrapping: true,
-  autoCloseBrackets: true,
-  extraKeys: {
-    Tab: (cm) => {
-      if (cm.somethingSelected()) cm.indentSelection("add");
-      else cm.execCommand("insertSoftTab");
-    },
-    "Ctrl-Space": "autocomplete",
-  },
-  gutters: ["CodeMirror-linenumbers"],
-});
-
-editor.on("inputRead", (cm, input) => {
-  if (input.text && input.text[0].trim()) {
-    CodeMirror.commands.autocomplete(cm, null, {
-      completeSingle: false,
-      hint: () => {
-        const cur = cm.getCursor();
-        const token = cm.getTokenAt(cur);
-        const word = token.string;
-        const list = customKeywords
-          .filter((kw) => kw.startsWith(word))
-          .map((kw) => ({ text: kw }));
-
-        return {
-          list: list,
-          from: CodeMirror.Pos(cur.line, token.start),
-          to: CodeMirror.Pos(cur.line, token.end),
-        };
-      },
-    });
-  }
-});
-
 let x = Math.floor(Math.random() * 32);
 let y = Math.floor(Math.random() * 32);
 let dead = false;
@@ -249,8 +180,8 @@ let importObject = {
       y = ny;
 
       if (tile_types[ny][nx] == TRAP) {
-          tile_types[ny][nx] = OPEN
-          return -2;
+        tile_types[ny][nx] = OPEN;
+        return -2;
       }
 
       return 0;
@@ -279,10 +210,16 @@ let importObject = {
       const nx = x + dx;
       const ny = y + dy;
 
-      if ((nx < 0 || nx >= grid.x || ny < 0 || ny >= grid.y) || tile_types[ny][nx] != OPEN) {
+      if (
+        nx < 0 ||
+        nx >= grid.x ||
+        ny < 0 ||
+        ny >= grid.y ||
+        tile_types[ny][nx] != OPEN
+      ) {
         return false;
       }
-      
+
       tile_types[ny][nx] = TRAP;
 
       return true;
@@ -294,9 +231,9 @@ let importObject = {
 
       if (nx < 0 || nx >= grid.x || ny < 0 || ny >= grid.y) {
         return -1;
-      } else if (inStorm(nx, ny)) { 
+      } else if (inStorm(nx, ny)) {
         return STORM;
-      }else {
+      } else {
         return tile_types[y + dy][x + dx];
       }
     },
@@ -358,9 +295,8 @@ WebAssembly.instantiateStreaming(
 
       if (result.instance.exports.getHealth() == 0 && !dead) {
         dead = true;
-        alert("You're so dead bro")
+        alert("You're dead :(");
       }
     }, 25);
   });
 });
-
