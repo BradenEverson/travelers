@@ -1,43 +1,20 @@
 let moveDir = 0;
 
 while (true) {
-    if (peek right == enemy) {
+    if (peek right == wood or peek right == enemy) {
         attack right;
     }
-    if (peek down == enemy) {
+
+    if (peek down == wood or peek down == enemy) {
         attack down;
     }
-    if (peek left == enemy) {
+
+    if (peek left == wood or peek left == enemy) {
         attack left;
     }
-    if (peek up == enemy) {
-        attack up;
-    }
 
-    if (peek right == wood) {
-        attack right;
-    }
-    if (peek down == wood) {
-        attack down;
-    }
-    if (peek left == wood) {
-        attack left;
-    }
-    if (peek up == wood) {
+    if (peek up == wood or peek up == enemy) {
         attack up;
-    }
-
-    if (peek right == open) {
-        trap right;
-    }
-    if (peek down == open) {
-        trap down;
-    }
-    if (peek left == open) {
-        trap left;
-    }
-    if (peek up == open) {
-        trap up;
     }
 
     if (moveDir == 0) {

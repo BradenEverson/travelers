@@ -43,6 +43,7 @@ let gameState = {
   player: { x: 0, y: 0, instance: null, dead: false },
   enemies: [],
   spawnPoints: [],
+  done: false,
 };
 
 let canvas, ctx;
@@ -231,7 +232,14 @@ function createEnemyVtable(enemy) {
   };
 }
 
-function loadWasmInstance(idx, code, memory, vtable, damageCheck, deathHandler) {
+function loadWasmInstance(
+  idx,
+  code,
+  memory,
+  vtable,
+  damageCheck,
+  deathHandler,
+) {
   WebAssembly.instantiateStreaming(fetch("wasm/traveler_wasm.wasm"), {
     env: vtable.env,
   }).then(({ instance }) => {
@@ -252,9 +260,9 @@ function setupWasmLoop(idx, instance, damageCheck, deathHandler) {
   let stormTicks = 0;
 
   if (idx == -1) {
-      gameState.player.instance = instance;
+    gameState.player.instance = instance;
   } else {
-      gameState.enemies[idx].instance = instance;
+    gameState.enemies[idx].instance = instance;
   }
 
   const intervalId = setInterval(() => {
@@ -350,15 +358,15 @@ function handlePlayerAttack(dx, dy) {
 }
 
 function directionFromDxDy(dx, dy) {
-    if (dx == 1) {
-        return DIRECTIONS.RIGHT;
-    } else if (dx == -1) {
-        return DIRECTIONS.LEFT;
-    } else if (dy == 1) {
-        return DIRECTIONS.DOWN;
-    } else {
-        return DIRECTIONS.UP;
-    }
+  if (dx == 1) {
+    return DIRECTIONS.RIGHT;
+  } else if (dx == -1) {
+    return DIRECTIONS.LEFT;
+  } else if (dy == 1) {
+    return DIRECTIONS.DOWN;
+  } else {
+    return DIRECTIONS.UP;
+  }
 }
 
 function handleEnemyAttack(enemy, dx, dy) {
@@ -367,7 +375,6 @@ function handleEnemyAttack(enemy, dx, dy) {
 
   if (!isValidPosition(targetX, targetY)) return 0;
   let direction = directionFromDxDy(dx, dy);
-
 
   if (targetX === gameState.player.x && targetY === gameState.player.y) {
     gameState.player.instance.exports.doDamage(DAMAGE_VALUES.ENEMY_ATTACK);
@@ -471,21 +478,23 @@ function setupGameLoop() {
 }
 
 function checkGameOver() {
-  if (gameState.player.dead) {
+  if (gameState.player.dead && !gameState.done) {
+    gameState.done = true;
     setTimeout(() => {
       alert("You have been defeated!");
-        // TODO: Add loss to the player history
-        window.location.href = "/"
+      // TODO: Add loss to the player history
+      window.location.href = "/";
     }, 1000);
     return;
   }
 
   const aliveEnemies = gameState.enemies.filter((e) => !e.dead);
-  if (aliveEnemies.length === 0) {
+  if (aliveEnemies.length === 0 && !gameState.done) {
+    gameState.done = true;
     setTimeout(() => {
       alert("All enemies defeated! Victory!");
       // TODO: Add loss to the player history
-      window.location.href = "/"
+      window.location.href = "/";
     }, 1000);
   }
 }
