@@ -1,13 +1,13 @@
-const GRID_SIZE = 48;
+const GRID_SIZE = 64;
 const STORM_DAMAGE_INTERVAL = 20;
-const GAME_TICK_INTERVAL = 1;//0;
-const STORM_GROW_INTERVAL = 15000;
+const GAME_TICK_INTERVAL = 10;
+const STORM_GROW_INTERVAL = 10000;
 
 const DAMAGE_VALUES = {
   TRAP: 20,
-  PLAYER_ATTACK: 1,
-  ENEMY_ATTACK: 1,
-  STORM: 1,
+  PLAYER_ATTACK: 15,
+  ENEMY_ATTACK: 15,
+  STORM: 5,
 };
 
 const TILE_TYPES = {
@@ -269,6 +269,7 @@ function setupWasmLoop(idx, instance, damageCheck, deathHandler) {
 
     if (instance.exports.getHealth() === 0) {
       clearInterval(intervalId);
+      console.log("Someone has been slain");
       deathHandler();
     }
   }, GAME_TICK_INTERVAL);
@@ -435,10 +436,8 @@ function handlePlayerDeath() {
 }
 
 function handleEnemyDeath(enemy) {
-  if (!enemy.dead) {
-    gameState.tileMap[enemy.y][enemy.x] = TILE_TYPES.OPEN;
-    enemy.dead = true;
-  }
+  gameState.tileMap[enemy.y][enemy.x] = TILE_TYPES.OPEN;
+  enemy.dead = true;
 }
 
 function isValidPosition(x, y) {
@@ -475,7 +474,8 @@ function checkGameOver() {
   if (gameState.player.dead) {
     setTimeout(() => {
       alert("You have been defeated!");
-      location.reload();
+        // TODO: Add loss to the player history
+        window.location.href = "/"
     }, 100);
     return;
   }
@@ -484,7 +484,8 @@ function checkGameOver() {
   if (aliveEnemies.length === 0) {
     setTimeout(() => {
       alert("All enemies defeated! Victory!");
-      location.reload();
+      // TODO: Add loss to the player history
+      window.location.href = "/"
     }, 100);
   }
 }
