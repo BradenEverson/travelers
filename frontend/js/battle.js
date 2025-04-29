@@ -1,6 +1,6 @@
 const GRID_SIZE = 48;
 const STORM_DAMAGE_INTERVAL = 20;
-const GAME_TICK_INTERVAL = 10;
+const GAME_TICK_INTERVAL = 1;//0;
 const STORM_GROW_INTERVAL = 15000;
 
 const DAMAGE_VALUES = {
@@ -223,7 +223,7 @@ function createEnemyVtable(enemy) {
       moveRelative: (dx, dy) => handleEnemyMovement(enemy, dx, dy),
       updateHealthBar: () => {},
       attackAt: (dx, dy) => handleEnemyAttack(enemy, dx, dy),
-      trapAt: (dx, dy) => handleEnemeyTrap(enemy, dx, dy),
+      trapAt: (dx, dy) => handleEnemyTrap(enemy, dx, dy),
       lookAtRelative: (dx, dy) => lookAtPosition(enemy.x + dx, enemy.y + dy),
       log_js: logMessage,
       memory: enemy.memory,
