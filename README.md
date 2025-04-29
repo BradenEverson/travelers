@@ -30,6 +30,4 @@ Happy hunting
 
 ### Current State
 
-Travelers is currently in heavy development, it's my current personal project I'm devoting the most time to. The current functionality reaches the ability to create and train your own robot script in the Dojo, where you can sandbox in different terrain elements and simulated enemies. 
-
-The next step I'm working on is some added convenience to the training page, followed by the multiplayer server that can simulate a fight to the death between a series of registered and submitted scripts. Feel free to check everything out in its current state, or check back in later when things are looking a little cooler
+Travelers is currently in heavy development, it's my current personal project I'm devoting the most time to. The current functionality reaches the ability to create and train your own robot script in the Dojo, and submitting it to be in the pool of valid battle royale contendors. The next plan of action is some convenience methods that autoload previously written scripts upon entering the dojo, quality of life updates in the language itself and finally a better looking art style (that being said it will be me creating the art so I guess I can't promise it to be "better" looking)
