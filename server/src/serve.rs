@@ -84,7 +84,6 @@ impl Service<Request<body::Incoming>> for BattleService {
                         creator: us,
                         others: them,
                     };
-                    println!("{m:?}");
 
                     let buf = serde_json::to_string(&m).expect("Failed to deserialize");
 
