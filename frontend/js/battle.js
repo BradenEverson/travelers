@@ -211,7 +211,7 @@ function createPlayerVtable() {
       trapAt: (dx, dy) => handlePlayerTrap(dx, dy),
       lookAtRelative: (dx, dy) =>
         lookAtPosition(gameState.player.x + dx, gameState.player.y + dy),
-      log_js: logMessage,
+      log_js: (ptr, len) => logMessage(memory, ptr, len),
       memory: memory,
     },
   };
@@ -225,7 +225,7 @@ function createEnemyVtable(enemy) {
       attackAt: (dx, dy) => handleEnemyAttack(enemy, dx, dy),
       trapAt: (dx, dy) => handleEnemyTrap(enemy, dx, dy),
       lookAtRelative: (dx, dy) => lookAtPosition(enemy.x + dx, enemy.y + dy),
-      log_js: logMessage,
+      log_js: (ptr, len) => logMessage(enemy.memory, ptr, len),
       memory: enemy.memory,
     },
   };
@@ -444,8 +444,8 @@ function isValidPosition(x, y) {
   return x >= 0 && x < GRID_SIZE && y >= 0 && y < GRID_SIZE;
 }
 
-function logMessage(ptr, len) {
-  const buffer = new Uint8Array(memory.buffer, ptr, len);
+function logMessage(mem, ptr, len) {
+  const buffer = new Uint8Array(mem.buffer, ptr, len);
   console.log(new TextDecoder().decode(buffer));
 }
 
