@@ -1,4 +1,3 @@
-let woodCount = 3;
 let moveDir = 0;
 
 while (true) {
@@ -15,38 +14,30 @@ while (true) {
         attack up;
     }
 
-    if (peek right == wood and woodCount < 6) {
+    if (peek right == wood) {
         attack right;
-        let woodCount = woodCount + 1;
     }
-    if (peek down == wood and woodCount < 6) {
+    if (peek down == wood) {
         attack down;
-        let woodCount = woodCount + 1;
     }
-    if (peek left == wood and woodCount < 6) {
+    if (peek left == wood) {
         attack left;
-        let woodCount = woodCount + 1;
     }
-    if (peek up == wood and woodCount < 6) {
+    if (peek up == wood) {
         attack up;
-        let woodCount = woodCount + 1;
     }
 
     if (peek right == open) {
         trap right;
-        let woodCount = woodCount - 3;
     }
     if (peek down == open) {
         trap down;
-        let woodCount = woodCount - 3;
     }
     if (peek left == open) {
         trap left;
-        let woodCount = woodCount - 3;
     }
     if (peek up == open) {
         trap up;
-        let woodCount = woodCount - 3;
     }
 
     if (moveDir == 0) {
