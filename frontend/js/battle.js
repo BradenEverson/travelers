@@ -7,7 +7,7 @@ const DAMAGE_VALUES = {
   TRAP: 20,
   PLAYER_ATTACK: 15,
   ENEMY_ATTACK: 15,
-  STORM: 5,
+  STORM: 1,
 };
 
 const TILE_TYPES = {

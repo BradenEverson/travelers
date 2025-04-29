@@ -32,48 +32,46 @@ while (true) {
         let woodCount = woodCount + 1;
     }
 
-    if (woodCount >= 3) {
-        if (peek right == open) {
-            trap right;
-            let woodCount = woodCount - 3;
-        }
-        if (peek down == open) {
-            trap down;
-            let woodCount = woodCount - 3;
-        }
-        if (peek left == open) {
-            trap left;
-            let woodCount = woodCount - 3;
-        }
-        if (peek up == open) {
-            trap up;
-            let woodCount = woodCount - 3;
-        }
+    if (peek right == open) {
+        trap right;
+        let woodCount = woodCount - 3;
+    }
+    if (peek down == open) {
+        trap down;
+        let woodCount = woodCount - 3;
+    }
+    if (peek left == open) {
+        trap left;
+        let woodCount = woodCount - 3;
+    }
+    if (peek up == open) {
+        trap up;
+        let woodCount = woodCount - 3;
     }
 
     if (moveDir == 0) {
-        if (peek right != border and peek right != storm and peek right != stone and peek right != trap) {
+        if (peek right != border and peek right != storm and peek right != stone) {
             move right;
         } else {
             let moveDir = 1;
         }
     }
     if (moveDir == 1) {
-        if (peek down != border and peek down != storm and peek down != stone and peek down != trap) {
+        if (peek down != border and peek down != storm and peek down != stone) {
             move down;
         } else {
             let moveDir = 2;
         }
     }
     if (moveDir == 2) {
-        if (peek left != border and peek left != storm and peek left != stone and peek left != trap) {
+        if (peek left != border and peek left != storm and peek left != stone) {
             move left;
         } else {
             let moveDir = 3;
         }
     }
     if (moveDir == 3) {
-        if (peek up != border and peek up != storm and peek up != stone and peek up != trap) {
+        if (peek up != border and peek up != storm and peek up != stone) {
             move up;
         } else {
             let moveDir = 0;
