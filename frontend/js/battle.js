@@ -167,6 +167,7 @@ function initializePlayer(gameData) {
 
   const playerVtable = createPlayerVtable();
   loadWasmInstance(
+    -1,
     gameData.creator,
     memory,
     playerVtable,
@@ -188,6 +189,7 @@ function initializeEnemies(gameData) {
 
     const enemyVtable = createEnemyVtable(enemy);
     loadWasmInstance(
+      index,
       enemyCode,
       enemy.memory,
       enemyVtable,
@@ -229,12 +231,12 @@ function createEnemyVtable(enemy) {
   };
 }
 
-function loadWasmInstance(code, memory, vtable, damageCheck, deathHandler) {
+function loadWasmInstance(idx, code, memory, vtable, damageCheck, deathHandler) {
   WebAssembly.instantiateStreaming(fetch("wasm/traveler_wasm.wasm"), {
     env: vtable.env,
   }).then(({ instance }) => {
     loadWasmProgram(code, memory, instance);
-    setupWasmLoop(instance, damageCheck, deathHandler);
+    setupWasmLoop(idx, instance, damageCheck, deathHandler);
   });
 }
 
@@ -246,13 +248,19 @@ function loadWasmProgram(code, memory, instance) {
   instance.exports.loadProgram(ptr, encodedCode.length);
 }
 
-function setupWasmLoop(instance, damageCheck, deathHandler) {
+function setupWasmLoop(idx, instance, damageCheck, deathHandler) {
   let stormTicks = 0;
   const intervalId = setInterval(() => {
     if (instance.exports.getHealth() === 0) return;
 
     stormTicks++;
     instance.exports.step();
+
+    if (idx == -1) {
+      gameState.player.instance = instance;
+    } else {
+      gameState.enemies[idx].instance = instance;
+    }
 
     if (stormTicks % STORM_DAMAGE_INTERVAL === 0 && damageCheck()) {
       instance.exports.doDamage(DAMAGE_VALUES.STORM);
