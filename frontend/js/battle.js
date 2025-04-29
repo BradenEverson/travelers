@@ -9,14 +9,14 @@ const TILE_TYPES = {
   ROCK: 2,
   WOOD: 3,
   STORM: 4,
-  TRAP: 5
+  TRAP: 5,
 };
 
 const DIRECTIONS = {
   UP: 0,
   RIGHT: 1,
   DOWN: 2,
-  LEFT: 3
+  LEFT: 3,
 };
 
 const COLORS = {
@@ -27,7 +27,7 @@ const COLORS = {
   WOOD: "#854d0e",
   GRASS: "#4ade80",
   TRAP: "#380303",
-  GRID_LINES: "#1a202c"
+  GRID_LINES: "#1a202c",
 };
 
 let gameState = {
@@ -35,7 +35,7 @@ let gameState = {
   stormLevel: 0,
   player: { x: 0, y: 0, instance: null, dead: false },
   enemies: [],
-  spawnPoints: []
+  spawnPoints: [],
 };
 
 let canvas, ctx;
@@ -49,7 +49,7 @@ function init() {
 }
 
 function generateTerrain() {
-  gameState.tileMap = Array.from({ length: GRID_SIZE }, (_, y) => 
+  gameState.tileMap = Array.from({ length: GRID_SIZE }, (_, y) =>
     Array.from({ length: GRID_SIZE }, (_, x) => {
       const rand = Math.random();
       let tileType;
@@ -62,7 +62,7 @@ function generateTerrain() {
       }
 
       return tileType;
-    })
+    }),
   );
 }
 
@@ -81,15 +81,20 @@ function drawGrid() {
 }
 
 function getTileColor(x, y) {
-  if (x === gameState.player.x && y === gameState.player.y) return COLORS.PLAYER;
+  if (x === gameState.player.x && y === gameState.player.y)
+    return COLORS.PLAYER;
   if (gameState.tileMap[y][x] === TILE_TYPES.ENEMY) return COLORS.ENEMY;
   if (inStormArea(x, y)) return COLORS.STORM;
 
   switch (gameState.tileMap[y][x]) {
-    case TILE_TYPES.ROCK: return COLORS.ROCK;
-    case TILE_TYPES.WOOD: return COLORS.WOOD;
-    case TILE_TYPES.TRAP: return COLORS.TRAP;
-    default: return COLORS.GRASS;
+    case TILE_TYPES.ROCK:
+      return COLORS.ROCK;
+    case TILE_TYPES.WOOD:
+      return COLORS.WOOD;
+    case TILE_TYPES.TRAP:
+      return COLORS.TRAP;
+    default:
+      return COLORS.GRASS;
   }
 }
 
@@ -102,7 +107,7 @@ function drawGridLines(cellSize) {
     ctx.moveTo(i * cellSize, 0);
     ctx.lineTo(i * cellSize, canvas.height);
     ctx.stroke();
-    
+
     ctx.beginPath();
     ctx.moveTo(0, i * cellSize);
     ctx.lineTo(canvas.width, i * cellSize);
@@ -111,10 +116,12 @@ function drawGridLines(cellSize) {
 }
 
 function inStormArea(x, y) {
-  return x < gameState.stormLevel ||
-         x >= GRID_SIZE - gameState.stormLevel ||
-         y < gameState.stormLevel ||
-         y >= GRID_SIZE - gameState.stormLevel;
+  return (
+    x < gameState.stormLevel ||
+    x >= GRID_SIZE - gameState.stormLevel ||
+    y < gameState.stormLevel ||
+    y >= GRID_SIZE - gameState.stormLevel
+  );
 }
 
 async function startCountdown() {
@@ -123,11 +130,11 @@ async function startCountdown() {
 
   for (let i = 3; i > 0; i--) {
     countdownElement.textContent = i;
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
   }
-  
+
   countdownElement.textContent = "FIGHT!";
-  await new Promise(resolve => setTimeout(resolve, 500));
+  await new Promise((resolve) => setTimeout(resolve, 500));
   countdownElement.style.display = "none";
   startGame();
 }
@@ -156,7 +163,7 @@ function initializePlayer(gameData) {
     memory,
     playerVtable,
     () => inStormArea(gameState.player.x, gameState.player.y),
-    () => gameState.player.dead = true
+    () => (gameState.player.dead = true),
   );
 }
 
@@ -168,7 +175,7 @@ function initializeEnemies(gameData) {
       y: spawnPoint[1],
       instance: null,
       dead: false,
-      memory: new WebAssembly.Memory({ initial: 2 })
+      memory: new WebAssembly.Memory({ initial: 2 }),
     };
 
     const enemyVtable = createEnemyVtable(enemy, index);
@@ -177,7 +184,7 @@ function initializeEnemies(gameData) {
       enemy.memory,
       enemyVtable,
       () => inStormArea(enemy.x, enemy.y),
-      () => handleEnemyDeath(enemy)
+      () => handleEnemyDeath(enemy),
     );
 
     gameState.enemies.push(enemy);
@@ -192,10 +199,11 @@ function createPlayerVtable() {
       updateHealthBar: updatePlayerHealth,
       attackAt: (dx, dy) => handlePlayerAttack(dx, dy),
       trapAt: (dx, dy) => handlePlayerTrap(dx, dy),
-      lookAtRelative: (dx, dy) => lookAtPosition(gameState.player.x + dx, gameState.player.y + dy),
+      lookAtRelative: (dx, dy) =>
+        lookAtPosition(gameState.player.x + dx, gameState.player.y + dy),
       log_js: logMessage,
-      memory: memory
-    }
+      memory: memory,
+    },
   };
 }
 
@@ -208,16 +216,15 @@ function createEnemyVtable(enemy, index) {
       trapAt: () => false,
       lookAtRelative: (dx, dy) => lookAtPosition(enemy.x + dx, enemy.y + dy),
       log_js: logMessage,
-      memory: enemy.memory
-    }
+      memory: enemy.memory,
+    },
   };
 }
 
 function loadWasmInstance(code, memory, vtable, damageCheck, deathHandler) {
-  WebAssembly.instantiateStreaming(
-    fetch("wasm/traveler_wasm.wasm"),
-    { env: vtable.env }
-  ).then(({ instance }) => {
+  WebAssembly.instantiateStreaming(fetch("wasm/traveler_wasm.wasm"), {
+    env: vtable.env,
+  }).then(({ instance }) => {
     loadWasmProgram(code, memory, instance);
     setupWasmLoop(instance, damageCheck, deathHandler);
   });
@@ -235,7 +242,7 @@ function setupWasmLoop(instance, damageCheck, deathHandler) {
   let stormTicks = 0;
   const intervalId = setInterval(() => {
     if (instance.exports.getHealth() === 0) return;
-    
+
     stormTicks++;
     instance.exports.step();
 
@@ -255,7 +262,7 @@ function handlePlayerMovement(dx, dy) {
   const newY = gameState.player.y + dy;
 
   if (!isValidPosition(newX, newY)) return -1;
-  
+
   const targetTile = gameState.tileMap[newY][newX];
   if (![TILE_TYPES.OPEN, TILE_TYPES.TRAP].includes(targetTile)) return -1;
 
@@ -275,7 +282,7 @@ function handleEnemyMovement(enemy, dx, dy) {
   const newY = enemy.y + dy;
 
   if (!isValidPosition(newX, newY)) return -1;
-  
+
   const targetTile = gameState.tileMap[newY][newX];
   if (![TILE_TYPES.OPEN, TILE_TYPES.TRAP].includes(targetTile)) return -1;
 
@@ -295,9 +302,9 @@ function handleEnemyMovement(enemy, dx, dy) {
 function handlePlayerAttack(dx, dy) {
   const targetX = gameState.player.x + dx;
   const targetY = gameState.player.y + dy;
-  
+
   if (!isValidPosition(targetX, targetY)) return 0;
-  
+
   const tile = gameState.tileMap[targetY][targetX];
   if (tile === TILE_TYPES.WOOD || tile === TILE_TYPES.ENEMY) {
     gameState.tileMap[targetY][targetX] = TILE_TYPES.OPEN;
@@ -309,10 +316,10 @@ function handlePlayerAttack(dx, dy) {
 function handlePlayerTrap(dx, dy) {
   const targetX = gameState.player.x + dx;
   const targetY = gameState.player.y + dy;
-  
+
   if (!isValidPosition(targetX, targetY)) return false;
   if (gameState.tileMap[targetY][targetX] !== TILE_TYPES.OPEN) return false;
-  
+
   gameState.tileMap[targetY][targetX] = TILE_TYPES.TRAP;
   return true;
 }
@@ -353,7 +360,8 @@ function shuffleArray(array) {
 function setupGameLoop() {
   setInterval(() => {
     gameState.stormLevel = Math.min(gameState.stormLevel + 1, GRID_SIZE / 2);
-    document.getElementById("storm").textContent = `Storm Level: ${gameState.stormLevel}`;
+    document.getElementById("storm").textContent =
+      `Storm Level: ${gameState.stormLevel}`;
   }, STORM_GROW_INTERVAL);
 
   setInterval(() => {
@@ -367,8 +375,8 @@ function checkGameOver() {
     alert("Game Over - You died!");
     location.reload();
   }
-  
-  const aliveEnemies = gameState.enemies.filter(e => !e.dead);
+
+  const aliveEnemies = gameState.enemies.filter((e) => !e.dead);
   if (aliveEnemies.length === 0) {
     alert("Victory! All enemies defeated!");
     location.reload();
