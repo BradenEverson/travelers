@@ -328,6 +328,10 @@ function handlePlayerAttack(dx, dy) {
 
     if (enemy) {
       enemy.instance.exports.doDamage(DAMAGE_VALUES.PLAYER_ATTACK);
+
+      let direction = directionFromDxDy(dx, dy);
+
+      enemy.instance.exports.hitDirection(direction, 5);
       result = 1;
     }
   }
@@ -335,14 +339,29 @@ function handlePlayerAttack(dx, dy) {
   return result;
 }
 
+function directionFromDxDy(dx, dy) {
+    if (dx == 1) {
+        return DIRECTIONS.RIGHT;
+    } else if (dx == -1) {
+        return DIRECTIONS.LEFT;
+    } else if (dy == 1) {
+        return DIRECTIONS.DOWN;
+    } else {
+        return DIRECTIONS.UP;
+    }
+}
+
 function handleEnemyAttack(enemy, dx, dy) {
   const targetX = enemy.x + dx;
   const targetY = enemy.y + dy;
 
   if (!isValidPosition(targetX, targetY)) return 0;
+  let direction = directionFromDxDy(dx, dy);
+
 
   if (targetX === gameState.player.x && targetY === gameState.player.y) {
     gameState.player.instance.exports.doDamage(DAMAGE_VALUES.ENEMY_ATTACK);
+      gameState.player.instance.exports.hitDirection(direction, 5);
     return 1;
   }
 
@@ -350,6 +369,20 @@ function handleEnemyAttack(enemy, dx, dy) {
   if (tile === TILE_TYPES.WOOD) {
     gameState.tileMap[targetY][targetX] = TILE_TYPES.OPEN;
     return 2;
+  } else if (tile === TILE_TYPES.ENEMY) {
+    const enemy2 = gameState.enemies.find(
+      (e) => e.x === targetX && e.y === targetY && !e.dead,
+    );
+
+    if (enemy2) {
+      enemy2.instance.exports.doDamage(DAMAGE_VALUES.PLAYER_ATTACK);
+
+      let direction = directionFromDxDy(dx, dy);
+
+      enemy2.instance.exports.hitDirection(direction, 5);
+
+      return 1;
+    }
   }
 
   return 0;
