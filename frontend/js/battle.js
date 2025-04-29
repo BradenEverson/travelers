@@ -371,7 +371,7 @@ function handleEnemyAttack(enemy, dx, dy) {
 
   if (targetX === gameState.player.x && targetY === gameState.player.y) {
     gameState.player.instance.exports.doDamage(DAMAGE_VALUES.ENEMY_ATTACK);
-      gameState.player.instance.exports.hitDirection(direction, 5);
+    gameState.player.instance.exports.hitDirection(direction, 5);
     return 1;
   }
 
