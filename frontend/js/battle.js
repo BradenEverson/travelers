@@ -1,7 +1,7 @@
-const GRID_SIZE = 64;
+const GRID_SIZE = 48;
 const STORM_DAMAGE_INTERVAL = 20;
-const GAME_TICK_INTERVAL = 25;
-const STORM_GROW_INTERVAL = 30000;
+const GAME_TICK_INTERVAL = 10;
+const STORM_GROW_INTERVAL = 15000;
 
 const DAMAGE_VALUES = {
   TRAP: 20,
@@ -250,17 +250,18 @@ function loadWasmProgram(code, memory, instance) {
 
 function setupWasmLoop(idx, instance, damageCheck, deathHandler) {
   let stormTicks = 0;
+
+  if (idx == -1) {
+      gameState.player.instance = instance;
+  } else {
+      gameState.enemies[idx].instance = instance;
+  }
+
   const intervalId = setInterval(() => {
     if (instance.exports.getHealth() === 0) return;
 
     stormTicks++;
     instance.exports.step();
-
-    if (idx == -1) {
-      gameState.player.instance = instance;
-    } else {
-      gameState.enemies[idx].instance = instance;
-    }
 
     if (stormTicks % STORM_DAMAGE_INTERVAL === 0 && damageCheck()) {
       instance.exports.doDamage(DAMAGE_VALUES.STORM);
