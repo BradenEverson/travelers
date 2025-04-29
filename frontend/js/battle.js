@@ -223,7 +223,7 @@ function createEnemyVtable(enemy) {
       moveRelative: (dx, dy) => handleEnemyMovement(enemy, dx, dy),
       updateHealthBar: () => {},
       attackAt: (dx, dy) => handleEnemyAttack(enemy, dx, dy),
-      trapAt: () => false,
+      trapAt: (dx, dy) => handleEnemeyTrap(enemy, dx, dy),
       lookAtRelative: (dx, dy) => lookAtPosition(enemy.x + dx, enemy.y + dy),
       log_js: logMessage,
       memory: enemy.memory,
@@ -399,6 +399,17 @@ function handleEnemyAttack(enemy, dx, dy) {
 function handlePlayerTrap(dx, dy) {
   const targetX = gameState.player.x + dx;
   const targetY = gameState.player.y + dy;
+
+  if (!isValidPosition(targetX, targetY)) return false;
+  if (gameState.tileMap[targetY][targetX] !== TILE_TYPES.OPEN) return false;
+
+  gameState.tileMap[targetY][targetX] = TILE_TYPES.TRAP;
+  return true;
+}
+
+function handleEnemyTrap(enemy, dx, dy) {
+  const targetX = enemy.x + dx;
+  const targetY = enemy.y + dy;
 
   if (!isValidPosition(targetX, targetY)) return false;
   if (gameState.tileMap[targetY][targetX] !== TILE_TYPES.OPEN) return false;
