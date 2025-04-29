@@ -3,6 +3,13 @@ const STORM_DAMAGE_INTERVAL = 20;
 const GAME_TICK_INTERVAL = 25;
 const STORM_GROW_INTERVAL = 30000;
 
+const DAMAGE_VALUES = {
+  TRAP: 20,
+  PLAYER_ATTACK: 1,
+  ENEMY_ATTACK: 1,
+  STORM: 1,
+};
+
 const TILE_TYPES = {
   OPEN: 0,
   ENEMY: 1,
@@ -139,6 +146,7 @@ async function startCountdown() {
   startGame();
 }
 
+// Game Core
 async function startGame() {
   try {
     const response = await fetch(`/create?id=${localStorage.getItem("id")}`);
@@ -163,7 +171,7 @@ function initializePlayer(gameData) {
     memory,
     playerVtable,
     () => inStormArea(gameState.player.x, gameState.player.y),
-    () => (gameState.player.dead = true),
+    () => handlePlayerDeath(),
   );
 }
 
@@ -178,7 +186,7 @@ function initializeEnemies(gameData) {
       memory: new WebAssembly.Memory({ initial: 2 }),
     };
 
-    const enemyVtable = createEnemyVtable(enemy, index);
+    const enemyVtable = createEnemyVtable(enemy);
     loadWasmInstance(
       enemyCode,
       enemy.memory,
@@ -207,12 +215,12 @@ function createPlayerVtable() {
   };
 }
 
-function createEnemyVtable(enemy, index) {
+function createEnemyVtable(enemy) {
   return {
     env: {
       moveRelative: (dx, dy) => handleEnemyMovement(enemy, dx, dy),
       updateHealthBar: () => {},
-      attackAt: () => 0,
+      attackAt: (dx, dy) => handleEnemyAttack(enemy, dx, dy),
       trapAt: () => false,
       lookAtRelative: (dx, dy) => lookAtPosition(enemy.x + dx, enemy.y + dy),
       log_js: logMessage,
@@ -247,7 +255,7 @@ function setupWasmLoop(instance, damageCheck, deathHandler) {
     instance.exports.step();
 
     if (stormTicks % STORM_DAMAGE_INTERVAL === 0 && damageCheck()) {
-      instance.exports.doDamage(1);
+      instance.exports.doDamage(DAMAGE_VALUES.STORM);
     }
 
     if (instance.exports.getHealth() === 0) {
@@ -271,6 +279,7 @@ function handlePlayerMovement(dx, dy) {
 
   if (targetTile === TILE_TYPES.TRAP) {
     gameState.tileMap[newY][newX] = TILE_TYPES.OPEN;
+    gameState.player.instance.exports.doDamage(DAMAGE_VALUES.TRAP);
     return -2;
   }
 
@@ -293,6 +302,7 @@ function handleEnemyMovement(enemy, dx, dy) {
 
   if (targetTile === TILE_TYPES.TRAP) {
     gameState.tileMap[newY][newX] = TILE_TYPES.OPEN;
+    enemy.instance.exports.doDamage(DAMAGE_VALUES.TRAP);
     return -2;
   }
 
@@ -306,10 +316,42 @@ function handlePlayerAttack(dx, dy) {
   if (!isValidPosition(targetX, targetY)) return 0;
 
   const tile = gameState.tileMap[targetY][targetX];
-  if (tile === TILE_TYPES.WOOD || tile === TILE_TYPES.ENEMY) {
+  let result = 0;
+
+  if (tile === TILE_TYPES.WOOD) {
     gameState.tileMap[targetY][targetX] = TILE_TYPES.OPEN;
-    return tile === TILE_TYPES.ENEMY ? 1 : 2;
+    result = 2;
+  } else if (tile === TILE_TYPES.ENEMY) {
+    const enemy = gameState.enemies.find(
+      (e) => e.x === targetX && e.y === targetY && !e.dead,
+    );
+
+    if (enemy) {
+      enemy.instance.exports.doDamage(DAMAGE_VALUES.PLAYER_ATTACK);
+      result = 1;
+    }
   }
+
+  return result;
+}
+
+function handleEnemyAttack(enemy, dx, dy) {
+  const targetX = enemy.x + dx;
+  const targetY = enemy.y + dy;
+
+  if (!isValidPosition(targetX, targetY)) return 0;
+
+  if (targetX === gameState.player.x && targetY === gameState.player.y) {
+    gameState.player.instance.exports.doDamage(DAMAGE_VALUES.ENEMY_ATTACK);
+    return 1;
+  }
+
+  const tile = gameState.tileMap[targetY][targetX];
+  if (tile === TILE_TYPES.WOOD) {
+    gameState.tileMap[targetY][targetX] = TILE_TYPES.OPEN;
+    return 2;
+  }
+
   return 0;
 }
 
@@ -334,10 +376,16 @@ function updatePlayerHealth(hp) {
   document.getElementById("hp").textContent = `Health: ${hp}/100`;
 }
 
+function handlePlayerDeath() {
+  gameState.player.dead = true;
+  gameState.tileMap[gameState.player.y][gameState.player.x] = TILE_TYPES.OPEN;
+}
+
 function handleEnemyDeath(enemy) {
-  gameState.tileMap[enemy.y][enemy.x] = TILE_TYPES.OPEN;
-  enemy.dead = true;
-  console.log("Enemy defeated!");
+  if (!enemy.dead) {
+    gameState.tileMap[enemy.y][enemy.x] = TILE_TYPES.OPEN;
+    enemy.dead = true;
+  }
 }
 
 function isValidPosition(x, y) {
@@ -372,14 +420,19 @@ function setupGameLoop() {
 
 function checkGameOver() {
   if (gameState.player.dead) {
-    alert("Game Over - You died!");
-    location.reload();
+    setTimeout(() => {
+      alert("You have been defeated!");
+      location.reload();
+    }, 100);
+    return;
   }
 
   const aliveEnemies = gameState.enemies.filter((e) => !e.dead);
   if (aliveEnemies.length === 0) {
-    alert("Victory! All enemies defeated!");
-    location.reload();
+    setTimeout(() => {
+      alert("All enemies defeated! Victory!");
+      location.reload();
+    }, 100);
   }
 }
 
