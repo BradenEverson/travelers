@@ -476,7 +476,7 @@ function checkGameOver() {
       alert("You have been defeated!");
         // TODO: Add loss to the player history
         window.location.href = "/"
-    }, 100);
+    }, 1000);
     return;
   }
 
@@ -486,7 +486,7 @@ function checkGameOver() {
       alert("All enemies defeated! Victory!");
       // TODO: Add loss to the player history
       window.location.href = "/"
-    }, 100);
+    }, 1000);
   }
 }
 
