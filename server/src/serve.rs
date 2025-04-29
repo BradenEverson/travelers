@@ -143,6 +143,10 @@ impl Service<Request<body::Incoming>> for BattleService {
                     page.read_to_end(&mut buf)
                         .expect("Failed to read to buffer");
 
+                    if fs.ends_with("css") {
+                        response = response.header("content-type", "text/css");
+                    }
+
                     response
                         .status(StatusCode::OK)
                         .body(Full::new(Bytes::copy_from_slice(&buf)))
