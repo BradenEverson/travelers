@@ -72,6 +72,10 @@ document.getElementById("submit").addEventListener("click", () => {
 
   const formData = new URLSearchParams();
   formData.append("code", code);
+  const id = localStorage.getItem("id");
+  if (id !== null) {
+      formData.append("id", id);
+  }
 
   fetch("/register", {
     method: "POST",
@@ -94,4 +98,33 @@ document.getElementById("submit").addEventListener("click", () => {
     .catch((error) => {
       console.error("Error:", error);
     });
+});
+
+window.addEventListener("load", () => {
+    const id = localStorage.getItem("id");
+    if (id !== null) {
+            
+      fetch(`/get?id=${id}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          return response.text();
+        })
+        .then((src) => {
+            if (src != "") {
+                editor.setValue(src);
+            } else {
+                localStorage.removeItem("id");
+            }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
+    }
 });

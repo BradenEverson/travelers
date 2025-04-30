@@ -68,6 +68,20 @@ impl Service<Request<body::Incoming>> for BattleService {
                         .body(Full::new(Bytes::copy_from_slice(&buf)))
                 }
 
+                (&Method::GET, "/get") => {
+                    let uri = req.uri().to_string();
+                    let queries = generate_query_map(uri);
+
+                    let id = &queries["id"];
+                    let uuid = Uuid::from_str(id).expect("Get UUID from id param");
+
+                    let src = state.lock().await.get_source(uuid).unwrap_or(String::new());
+
+                    response
+                        .status(StatusCode::OK)
+                        .body(Full::new(Bytes::copy_from_slice(src.as_bytes())))
+                }
+
                 (&Method::GET, "/create") => {
                     let uri = req.uri().to_string();
                     let queries = generate_query_map(uri);
@@ -128,7 +142,14 @@ impl Service<Request<body::Incoming>> for BattleService {
                         form_urlencoded::parse(&body_bytes).into_owned().collect();
 
                     let travler = Traveler::from_source(&form_params["code"]);
-                    let id = state.lock().await.register(travler);
+
+                    let id = if let Some(existing_id) = form_params.get("id") {
+                        let uuid = Uuid::from_str(existing_id).expect("Parse ID");
+
+                        state.lock().await.update(travler, uuid)
+                    } else {
+                        state.lock().await.register(travler)
+                    };
 
                     response
                         .status(StatusCode::OK)
