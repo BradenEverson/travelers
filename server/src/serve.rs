@@ -193,7 +193,9 @@ impl Service<Request<body::Incoming>> for BattleService {
                     let mut travler = Traveler::from_source(&form_params["code"]);
 
                     if let Some(name) = form_params.get("name") {
-                        travler.name = Some(name.to_string())
+                        if !name.is_empty() {
+                            travler.name = Some(name.to_string())
+                        }
                     }
 
                     let id = if let Some(existing_id) = form_params.get("id") {
