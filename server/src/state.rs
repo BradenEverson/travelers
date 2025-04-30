@@ -33,6 +33,19 @@ impl ServerState {
         self.fighters.get_mut(&id).map(|t| t.losses += 1);
     }
 
+    /// Sorts all fighters by a ranking metric
+    pub fn get_ranking(&self, sort_fn: fn(&Traveler) -> i32) -> Vec<Ranking> {
+        let mut rankings: Vec<Ranking> = self
+            .fighters
+            .values()
+            .map(|t| (t.clone(), sort_fn(t)).into())
+            .collect();
+
+        rankings.sort_by(|r1, r2| r1.score.cmp(&r2.score));
+
+        rankings
+    }
+
     /// Registers a new fighter and returns their UUID
     pub fn update(&mut self, new: Traveler, id: Uuid) -> Uuid {
         if let Some(existing) = self.fighters.get_mut(&id) {
@@ -82,18 +95,21 @@ impl ServerState {
 /// A fighter's script with some additional metadata
 #[derive(Debug, Default, Clone)]
 pub struct Traveler {
+    /// Name if specified
+    pub name: Option<String>,
     /// Source code in FightScript
     pub source_code: String,
     /// How many wins
-    pub wins: usize,
+    pub wins: i32,
     /// How many loses
-    pub losses: usize,
+    pub losses: i32,
 }
 
 impl FromStr for Traveler {
     type Err = ();
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         Ok(Self {
+            name: None,
             source_code: s.into(),
             wins: 0,
             losses: 0,
@@ -105,6 +121,7 @@ impl Traveler {
     /// Creates a new traveler from source
     pub fn from_source<STR: Into<String>>(src: STR) -> Self {
         Self {
+            name: None,
             source_code: src.into(),
             wins: 0,
             losses: 0,
@@ -129,4 +146,20 @@ pub struct Match {
     pub creator: String,
     /// All other scripts
     pub others: Vec<String>,
+}
+
+/// Ranking metadata for js
+#[derive(Clone, Debug, Serialize)]
+pub struct Ranking {
+    name: String,
+    score: i32,
+}
+
+impl From<(Traveler, i32)> for Ranking {
+    fn from(value: (Traveler, i32)) -> Self {
+        Self {
+            name: value.0.name.unwrap_or("unnamed traveler".into()),
+            score: value.1,
+        }
+    }
 }

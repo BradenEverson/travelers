@@ -94,6 +94,8 @@ impl Service<Request<body::Incoming>> for BattleService {
                 }
 
                 (&Method::GET, "/rankings") => {
+                    let rankings = state.lock().await.get_ranking(|t| (t.wins - t.losses));
+
                     todo!()
                 }
 
