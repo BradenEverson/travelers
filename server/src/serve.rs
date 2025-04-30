@@ -96,7 +96,11 @@ impl Service<Request<body::Incoming>> for BattleService {
                 (&Method::GET, "/rankings") => {
                     let rankings = state.lock().await.get_ranking(|t| (t.wins - t.losses));
 
-                    todo!()
+                    let serialized = serde_json::to_string(&rankings).expect("Failed to serialize");
+
+                    response
+                        .status(StatusCode::OK)
+                        .body(Full::new(Bytes::copy_from_slice(serialized.as_bytes())))
                 }
 
                 (&Method::GET, "/lose") => {
@@ -186,7 +190,11 @@ impl Service<Request<body::Incoming>> for BattleService {
                     let form_params: HashMap<String, String> =
                         form_urlencoded::parse(&body_bytes).into_owned().collect();
 
-                    let travler = Traveler::from_source(&form_params["code"]);
+                    let mut travler = Traveler::from_source(&form_params["code"]);
+
+                    if let Some(name) = form_params.get("name") {
+                        travler.name = Some(name.to_string())
+                    }
 
                     let id = if let Some(existing_id) = form_params.get("id") {
                         let uuid = Uuid::from_str(existing_id).expect("Parse ID");

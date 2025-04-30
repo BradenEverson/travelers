@@ -74,7 +74,13 @@ document.getElementById("submit").addEventListener("click", () => {
   formData.append("code", code);
   const id = localStorage.getItem("id");
   if (id !== null) {
-      formData.append("id", id);
+    formData.append("id", id);
+  }
+
+  const name = prompt("(Optional) Name Your Fighter");
+
+  if (name != null) {
+    formData.append("name", name);
   }
 
   fetch("/register", {
@@ -101,30 +107,29 @@ document.getElementById("submit").addEventListener("click", () => {
 });
 
 window.addEventListener("load", () => {
-    const id = localStorage.getItem("id");
-    if (id !== null) {
-            
-      fetch(`/get?id=${id}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
+  const id = localStorage.getItem("id");
+  if (id !== null) {
+    fetch(`/get?id=${id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.text();
       })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
-          return response.text();
-        })
-        .then((src) => {
-            if (src != "") {
-                editor.setValue(src);
-            } else {
-                localStorage.removeItem("id");
-            }
-        })
-        .catch((error) => {
-          console.error("Error:", error);
-        });
-    }
+      .then((src) => {
+        if (src != "") {
+          editor.setValue(src);
+        } else {
+          localStorage.removeItem("id");
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }
 });
