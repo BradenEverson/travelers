@@ -82,6 +82,55 @@ impl Service<Request<body::Incoming>> for BattleService {
                         .body(Full::new(Bytes::copy_from_slice(src.as_bytes())))
                 }
 
+                (&Method::GET, "/leaderboard") => {
+                    let mut buf = vec![];
+                    let mut page =
+                        File::open("frontend/leaderboard.html").expect("Failed to find file");
+                    page.read_to_end(&mut buf)
+                        .expect("Failed to read to buffer");
+                    response
+                        .status(StatusCode::OK)
+                        .body(Full::new(Bytes::copy_from_slice(&buf)))
+                }
+
+                (&Method::GET, "/rankings") => {
+                    let rankings = state.lock().await.get_ranking(|t| (t.wins - t.losses));
+
+                    let serialized = serde_json::to_string(&rankings).expect("Failed to serialize");
+
+                    response
+                        .status(StatusCode::OK)
+                        .body(Full::new(Bytes::copy_from_slice(serialized.as_bytes())))
+                }
+
+                (&Method::GET, "/lose") => {
+                    let uri = req.uri().to_string();
+                    let queries = generate_query_map(uri);
+
+                    let id = &queries["id"];
+                    let uuid = Uuid::from_str(id).expect("Get UUID from id param");
+
+                    state.lock().await.lose(uuid);
+
+                    response
+                        .status(StatusCode::OK)
+                        .body(Full::new(Bytes::new()))
+                }
+
+                (&Method::GET, "/win") => {
+                    let uri = req.uri().to_string();
+                    let queries = generate_query_map(uri);
+
+                    let id = &queries["id"];
+                    let uuid = Uuid::from_str(id).expect("Get UUID from id param");
+
+                    state.lock().await.win(uuid);
+
+                    response
+                        .status(StatusCode::OK)
+                        .body(Full::new(Bytes::new()))
+                }
+
                 (&Method::GET, "/create") => {
                     let uri = req.uri().to_string();
                     let queries = generate_query_map(uri);
@@ -141,7 +190,11 @@ impl Service<Request<body::Incoming>> for BattleService {
                     let form_params: HashMap<String, String> =
                         form_urlencoded::parse(&body_bytes).into_owned().collect();
 
-                    let travler = Traveler::from_source(&form_params["code"]);
+                    let mut travler = Traveler::from_source(&form_params["code"]);
+
+                    if let Some(name) = form_params.get("name") {
+                        travler.name = Some(name.to_string())
+                    }
 
                     let id = if let Some(existing_id) = form_params.get("id") {
                         let uuid = Uuid::from_str(existing_id).expect("Parse ID");

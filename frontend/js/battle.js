@@ -482,8 +482,14 @@ function checkGameOver() {
     gameState.done = true;
     setTimeout(() => {
       alert("You have been defeated!");
-      // TODO: Add loss to the player history
-      window.location.href = "/";
+      const id = localStorage.getItem("id");
+
+      fetch(`/lose?id=${id}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }).then((res) => (window.location.href = "/"));
     }, 1000);
     return;
   }
@@ -493,8 +499,17 @@ function checkGameOver() {
     gameState.done = true;
     setTimeout(() => {
       alert("All enemies defeated! Victory!");
-      // TODO: Add loss to the player history
-      window.location.href = "/";
+
+      const formData = new URLSearchParams();
+
+      const id = localStorage.getItem("id");
+
+      fetch(`/win?id=${id}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }).then((res) => (window.location.href = "/"));
     }, 1000);
   }
 }
