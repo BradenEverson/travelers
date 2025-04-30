@@ -82,6 +82,49 @@ impl Service<Request<body::Incoming>> for BattleService {
                         .body(Full::new(Bytes::copy_from_slice(src.as_bytes())))
                 }
 
+                (&Method::GET, "/leaderboard") => {
+                    let mut buf = vec![];
+                    let mut page =
+                        File::open("frontend/leaderboard.html").expect("Failed to find file");
+                    page.read_to_end(&mut buf)
+                        .expect("Failed to read to buffer");
+                    response
+                        .status(StatusCode::OK)
+                        .body(Full::new(Bytes::copy_from_slice(&buf)))
+                }
+
+                (&Method::GET, "/rankings") => {
+                    todo!()
+                }
+
+                (&Method::GET, "/lose") => {
+                    let uri = req.uri().to_string();
+                    let queries = generate_query_map(uri);
+
+                    let id = &queries["id"];
+                    let uuid = Uuid::from_str(id).expect("Get UUID from id param");
+
+                    state.lock().await.lose(uuid);
+
+                    response
+                        .status(StatusCode::OK)
+                        .body(Full::new(Bytes::new()))
+                }
+
+                (&Method::GET, "/win") => {
+                    let uri = req.uri().to_string();
+                    let queries = generate_query_map(uri);
+
+                    let id = &queries["id"];
+                    let uuid = Uuid::from_str(id).expect("Get UUID from id param");
+
+                    state.lock().await.win(uuid);
+
+                    response
+                        .status(StatusCode::OK)
+                        .body(Full::new(Bytes::new()))
+                }
+
                 (&Method::GET, "/create") => {
                     let uri = req.uri().to_string();
                     let queries = generate_query_map(uri);

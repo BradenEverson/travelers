@@ -23,6 +23,16 @@ impl ServerState {
         self.fighters.get(&id).map(|t| t.source_code.clone())
     }
 
+    /// Marks a traveler as winning the round
+    pub fn win(&mut self, id: Uuid) {
+        self.fighters.get_mut(&id).map(|t| t.wins += 1);
+    }
+
+    /// Marks a traveler as losing the round
+    pub fn lose(&mut self, id: Uuid) {
+        self.fighters.get_mut(&id).map(|t| t.losses += 1);
+    }
+
     /// Registers a new fighter and returns their UUID
     pub fn update(&mut self, new: Traveler, id: Uuid) -> Uuid {
         if let Some(existing) = self.fighters.get_mut(&id) {
