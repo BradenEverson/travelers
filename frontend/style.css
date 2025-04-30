@@ -28,3 +28,9 @@ body {
     5px 100%, 5px calc(100% - 5px), 0% calc(100% - 5px)
     );
 }
+.scoreboard {
+    font-family: 'Orbitron', sans-serif;
+}
+.rank-cell {
+    background-color: rgba(0, 0, 0, 0.7);
+}
