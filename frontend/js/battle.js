@@ -266,18 +266,18 @@ function setupWasmLoop(idx, instance, damageCheck, deathHandler) {
   }
 
   const intervalId = setInterval(() => {
-    if (instance.exports.getHealth() === 0) return;
+    if (instance.exports.getHealth() <= 0) return;
 
     stormTicks++;
     instance.exports.step();
 
     if (stormTicks % STORM_DAMAGE_INTERVAL === 0 && damageCheck()) {
+      instance.exports.doDamage(DAMAGE_VALUES.STORM);
       console.log("Dealing storm tick damage to " + idx);
       console.log("Health: " + instance.exports.getHealth());
-      instance.exports.doDamage(DAMAGE_VALUES.STORM);
     }
 
-    if (instance.exports.getHealth() === 0) {
+    if (instance.exports.getHealth() <= 0) {
       clearInterval(intervalId);
       console.log("Someone has been slain");
       deathHandler();

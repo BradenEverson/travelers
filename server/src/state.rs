@@ -18,6 +18,63 @@ pub struct ServerState {
 }
 
 impl ServerState {
+    /// Constructs a new state with placeholder defaults
+    pub fn sample_config() -> Self {
+        let mut state = Self::default();
+
+        for _ in 0..10 {
+            let dancer =
+                Traveler::from_str("while (true) { move down; move left; move up; move right; }")
+                    .unwrap();
+
+            state.register(dancer);
+        }
+
+        for _ in 0..10 {
+            state.register(
+                Traveler::from_str(
+                    r#"
+                while (true) {
+                    while (peek right != border and peek right != storm) {
+                        if (peek right == wood) {
+                            attack right;
+                        } else if (peek right == stone) {
+                            move down;
+                        }
+                        move right 1;
+                    }
+                    while (peek down != border and peek down != storm) {
+                        if (peek down == wood) {
+                            attack down;
+                        } else if (peek down == stone) {
+                            move left;
+                        }
+                        move down 1;
+                    }
+                    while (peek left != border and peek left != storm) {
+                        if (peek left == wood) {
+                            attack left;
+                        } else if (peek left == stone) {
+                            move up;
+                        }
+                        move left 1;
+                    }
+                    while (peek up != border and peek up != storm) {
+                        if (peek up == wood) {
+                            attack up;
+                        } else if (peek up == stone) {
+                            move right;
+                        }
+                        move up 1;
+                    } 
+                }"#,
+                )
+                .unwrap(),
+            );
+        }
+
+        state
+    }
     /// Gets the source code for a fighter if they exist
     pub fn get_source(&self, id: Uuid) -> Option<String> {
         self.fighters.get(&id).map(|t| t.source_code.clone())
