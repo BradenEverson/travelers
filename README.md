@@ -28,6 +28,3 @@ It's important to note how traps work. Robots spawn with 3 wood in their invento
 
 Happy hunting
 
-### Current State
-
-Travelers is currently in heavy development, it's my current personal project I'm devoting the most time to. The current functionality reaches the ability to create and train your own robot script in the Dojo, and submitting it to be in the pool of valid battle royale contendors. The next plan of action is further adding quality of life updates in the language itself and using a better looking art style (that being said it will be me creating the art so I guess I can't promise it to be "better" looking)
