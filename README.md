@@ -8,7 +8,7 @@ Robots cannot directly hurt one another, but they can place traps if they have t
 
 To train your program for the field, you can test scripts in the dojo, a 32x32 customizable environment where you can add environmental features and test how viable different strategies are. Once you're ready, you can export your script to the battlegrounds and reap your victory.
 
-### Basic Ruls
+### Basic Rules
 
 The rules of `Travelers` are relatively what you would expect, you can move, attack, place traps and peek in all 4 cardinal directions, a quick sample of these features would be:
 
